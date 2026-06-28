@@ -350,6 +350,14 @@ function triggerVaultBreak(dialCount: number) {
     if (el) el.textContent = `Total loot: $${vaultTotal}`;
   }
 
+  function refreshStatus() {
+    const el = ui.els['vault-status'] as HTMLElement | null;
+    const remaining = Math.max(0, picks - picked);
+    if (el) {
+      el.textContent = `Crack the vault doors before the alarm trips! You have ${remaining} pick${remaining !== 1 ? 's' : ''} remaining.`;
+    }
+  }
+
   for (let i = 0; i < totalBoxes; i++) {
     const box = document.createElement('div');
     box.className = 'vault-box';
@@ -382,6 +390,7 @@ function triggerVaultBreak(dialCount: number) {
       }
       vaultTotal = Math.min(vaultTotal, MAX_VAULT_WIN);
       refreshTotal();
+      refreshStatus();
       box.innerHTML = `<div class="valk gold">💎</div><div class="valm">${face}</div>`;
       picked++;
       if (picked >= picks) {
@@ -392,6 +401,7 @@ function triggerVaultBreak(dialCount: number) {
     gridEl.appendChild(box);
   }
 
+  refreshStatus();
   refreshTotal();
 
   function finishVault() {
