@@ -1,0 +1,129 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover, maximum-scale=1.0, user-scalable=no" />
+  <meta name="apple-mobile-web-app-capable" content="yes" />
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+  <meta name="theme-color" content="#0f1115" />
+  <title>Slot Heist</title>
+  <link rel="apple-touch-icon" sizes="180x180" href="icons/apple-touch-icon.png" />
+  <link rel="icon" type="image/png" sizes="192x192" href="icons/icon-192.png" />
+  <link rel="icon" type="image/png" sizes="512x512" href="icons/icon-512.png" />
+  <script type="module" src="/src/main.ts"></script>
+  <style>
+    html, body { margin: 0; padding: 0; width: 100%; height: 100%; background: #0f1115; }
+  </style>
+</head>
+<body>
+  <div id="app">
+    <header id="top-bar">
+      <div id="balance-wrap">
+        <span class="label">BANK</span>
+        <span id="balance">$500</span>
+      </div>
+      <div id="level-wrap">
+        <span class="label">LVL <span id="level">1</span></span>
+        <div id="xp-bar"><div id="xp-fill"></div></div>
+      </div>
+    </header>
+
+    <div id="game-area">
+      <div id="reels-container">
+        <div id="reels-overlay"></div>
+        <div id="reels">
+          <div class="reel" data-reel="0"></div>
+          <div class="reel" data-reel="1"></div>
+          <div class="reel" data-reel="2"></div>
+          <div class="reel" data-reel="3"></div>
+          <div class="reel" data-reel="4"></div>
+        </div>
+      </div>
+      <div id="win-line" class="hidden"></div>
+      <div id="multiplier-badge" class="hidden">×1</div>
+    </div>
+
+    <div id="controls">
+      <div id="bet-row">
+        <button id="bet-minus" class="chip" aria-label="Decrease bet">−</button>
+        <div id="bet-display">
+          <span class="label">BET</span>
+          <span id="bet-amount">$1</span>
+        </div>
+        <button id="bet-plus" class="chip" aria-label="Increase bet">+</button>
+      </div>
+      <div id="bet-chips">
+        <button class="chip-btn" data-val="1">$1</button>
+        <button class="chip-btn" data-val="5">$5</button>
+        <button class="chip-btn" data-val="10">$10</button>
+        <button class="chip-btn" data-val="25">$25</button>
+        <button class="chip-btn" data-val="50">$50</button>
+        <button class="chip-btn" data-val="100">$100</button>
+      </div>
+      <div id="spin-row">
+        <button id="turbo" class="toggle" title="Turbo">⚡</button>
+        <button id="spin" class="primary">SPIN</button>
+        <button id="info-btn" class="toggle" title="Paytable">?</button>
+      </div>
+      <div id="recent-wins"></div>
+    </div>
+  </div>
+
+  <div id="help-modal" class="modal hidden" role="dialog" aria-modal="true" aria-labelledby="help-title">
+    <div class="modal-content">
+      <h2 id="help-title">How to Play Slot Heist</h2>
+      <div class="help-body">
+        <p>Crack the vault and escape with the loot!</p>
+        <h3>Symbols</h3>
+        <ul>
+          <li><strong>💎 Diamond</strong> — Top payout (×250)</li>
+          <li><strong>🥇 Gold Bar</strong> — High payout (×125)</li>
+          <li><strong>🚪 Vault Door</strong> — Wild (substitutes anything)</li>
+          <li><strong>💵 Cash Stack</strong> — Mid payout (×75)</li>
+          <li><strong>🪙 Gold Coin</strong> — Low payout (×50)</li>
+          <li><strong>🛡️ Cop Badge</strong> — Low payout (×30)</li>
+          <li><strong>🔩 Drill Bit</strong> — Low payout (×20)</li>
+          <li><strong>🔔 Alarm Bell</strong> — Scatter (3+ = Free Spins)</li>
+          <li><strong>🎛️ Safe Dial</strong> — Bonus (3+ = Vault Break)</li>
+        </ul>
+        <h3>Bonuses</h3>
+        <p><strong>Free Spins</strong> — 3+ Bells award 10–25 free spins with a rising win multiplier.</p>
+        <p><strong>Vault Break</strong> — 3+ Safe Dials open the vault. Pick boxes, avoid buzzers.</p>
+        <p><strong>Wheel of Fortune</strong> — Mystery chance on any spin. Tap to spin for instant prizes.</p>
+        <h3>Tips</h3>
+        <p>Start with low bets. Build your bankroll before chasing the big vault break!</p>
+      </div>
+      <button id="help-dismiss" class="primary">Let’s Go!</button>
+    </div>
+  </div>
+
+  <div id="paytable-modal" class="modal hidden" role="dialog" aria-modal="true">
+    <div class="modal-content">
+      <h2>Paytable</h2>
+      <table id="paytable"></table>
+      <button id="paytable-close" class="primary">Close</button>
+    </div>
+  </div>
+
+  <div id="vault-break" class="modal hidden" role="dialog" aria-modal="true">
+    <div class="modal-content vault-content">
+      <h2>🔐 Vault Break</h2>
+      <p id="vault-status">Pick boxes to reveal loot. Watch out for buzzers!</p>
+      <div id="vault-grid"></div>
+      <div id="vault-total"></div>
+      <button id="vault-done" class="primary hidden">Collect Loot</button>
+    </div>
+  </div>
+
+  <div id="wheel-modal" class="modal hidden" role="dialog" aria-modal="true">
+    <div class="modal-content wheel-content">
+      <h2>🎡 Mystery Wheel</h2>
+      <div id="wheel"></div>
+      <button id="wheel-spin" class="primary">Spin</button>
+      <div id="wheel-result"></div>
+    </div>
+  </div>
+
+  <div id="message-toast" class="hidden"></div>
+</body>
+</html>
