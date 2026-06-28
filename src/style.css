@@ -10,12 +10,12 @@
   --wild: #00e5ff;
   --scatter: #ff66aa;
   --bonus: #ffaa00;
-  --cell-size: clamp(48px, 14vw, 78px);
+  --cell-size: clamp(44px, min(12vw, 16vh), 68px);
   --cell-gap: 0.35rem;
 }
 
 @media (orientation: landscape) and (max-height: 500px) {
-  :root { --cell-size: 56px; }
+  :root { --cell-size: 48px; }
 }
 
 * { box-sizing: border-box; }
@@ -34,7 +34,9 @@ html, body {
 #app {
   display: flex;
   flex-direction: column;
-  height: 100vh;
+  height: 100vh; /* fallback */
+  height: 100dvh;
+  min-height: -webkit-fill-available;
   padding: env(safe-area-inset-top) env(safe-area-inset-right) env(safe-area-inset-bottom) env(safe-area-inset-left);
 }
 
@@ -95,6 +97,7 @@ html, body {
 /* Game area */
 #game-area {
   flex: 1 1 auto;
+  min-height: 0;
   display: flex;
   flex-direction: column;
   align-items: center;
@@ -187,12 +190,13 @@ html, body {
 /* Controls */
 #controls {
   flex-shrink: 0;
-  padding: 0.6rem 1rem 1rem;
+  padding: 0.5rem 1rem 0.7rem;
+  padding-bottom: max(0.7rem, env(safe-area-inset-bottom));
   background: var(--panel);
   border-top: 1px solid #2a2f3a;
   display: flex;
   flex-direction: column;
-  gap: 0.5rem;
+  gap: 0.4rem;
 }
 
 #bet-row {

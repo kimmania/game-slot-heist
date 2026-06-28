@@ -80,7 +80,7 @@ export interface SavedGame {
 export const STORAGE_KEY = 'slot-heist-save';
 
 export const DEFAULT_SAVE: SavedGame = {
-  bank: 500,
+  bank: 100,
   xp: 0,
   level: 1,
   betIdx: 0,
