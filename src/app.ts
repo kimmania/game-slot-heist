@@ -2,7 +2,7 @@ import { loadGame, saveGame } from './storage';
 import { spinReels, random } from './rng';
 import { evaluateWin, countScatters, countBonus } from './reels';
 import { UI } from './ui';
-import { BET_AMOUNTS, xpForLevel, SYMBOLS } from './types';
+import { BET_AMOUNTS, xpForLevel, SYMBOLS, PAYLINES } from './types';
 import type { SavedGame, SymbolType } from './types';
 
 let state: SavedGame;
@@ -27,6 +27,7 @@ export function init() {
   }
 
   syncUI();
+  ui.renderHelpPaylines(PAYLINES);
 
   if (!state.hasSeenHelp) {
     ui.showHelp();
@@ -47,12 +48,13 @@ function bindEvents() {
     ui.setTurboActive(turbo);
     saveGame(state);
   });
-  ui.els['info-btn']?.addEventListener('click', () => { ui.showPaytable(); });
+  ui.els['info-btn']?.addEventListener('click', () => { ui.showHelp(); });
   ui.els['help-dismiss']?.addEventListener('click', () => {
     state.hasSeenHelp = true;
     ui.hideHelp();
     saveGame(state);
   });
+  ui.els['help-paytable-btn']?.addEventListener('click', () => { ui.hideHelp(); ui.showPaytable(); });
   ui.els['paytable-close']?.addEventListener('click', () => ui.hidePaytable());
   ui.els['vault-done']?.addEventListener('click', () => ui.hideVault());
   ui.els['wheel-spin']?.addEventListener('click', () => spinWheel());

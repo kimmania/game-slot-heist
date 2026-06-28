@@ -6,7 +6,7 @@ export class UI {
   constructor() {
     const ids = [
       'balance','level','xp-fill','reels','bet-amount','bet-minus','bet-plus','spin','turbo','info-btn',
-      'bet-chips','recent-wins','help-modal','help-dismiss','paytable-modal','paytable-close','paytable',
+      'bet-chips','recent-wins','help-modal','help-dismiss','help-paylines','paytable-modal','paytable-close','paytable',
       'vault-break','vault-status','vault-grid','vault-total','vault-done',
       'wheel-modal','wheel','wheel-spin','wheel-result','message-toast',
     ];
@@ -161,6 +161,26 @@ export class UI {
   setTurboActive(v: boolean) {
     const btn = this.els['turbo'] as HTMLElement;
     if (btn) btn.classList.toggle('active', v);
+  }
+
+  renderHelpPaylines(paylines: number[][]) {
+    const wrap = this.els['help-paylines'];
+    if (!wrap) return;
+    wrap.innerHTML = '';
+    for (let idx = 0; idx < paylines.length; idx++) {
+      const line = paylines[idx];
+      const mini = document.createElement('div');
+      mini.className = 'payline-mini';
+      mini.title = `Line ${idx + 1}`;
+      for (let row = 0; row < 3; row++) {
+        for (let reel = 0; reel < 5; reel++) {
+          const dot = document.createElement('div');
+          dot.className = 'payline-dot' + (line[reel] === row ? ' active' : '');
+          mini.appendChild(dot);
+        }
+      }
+      wrap.appendChild(mini);
+    }
   }
 
   renderPaytable() {
