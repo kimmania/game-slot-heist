@@ -310,22 +310,38 @@ function triggerVaultBreak(dialCount: number) {
   gridEl.innerHTML = '';
   let picks = dialCount;
   const totalBoxes = 12;
-  const boxValues: number[] = [];
-  const isBuzzer: boolean[] = [];
-  const prizes = [50, 100, 200, 300, 500, 2, 3, 5, 0, 0];
-  for (let i = 0; i < totalBoxes; i++) {
-    if (i < 2) { isBuzzer.push(true); boxValues.push(0); }
-    else { isBuzzer.push(false); boxValues.push(prizes[(i - 2) % prizes.length]); }
-  }
-  for (let i = totalBoxes - 1; i > 0; i--) {
+
+  // Build explicit boxes: 2 buzzers + 10 prizes (no value-range ambiguity)
+  interface VBox { isBuzzer: boolean; cash: number; multiplier: number; extraPicks: number; }
+  const boxes: VBox[] = [];
+  boxes.push({ isBuzzer: true, cash: 0, multiplier: 0, extraPicks: 0 }, { isBuzzer: true, cash: 0, multiplier: 0, extraPicks: 0 });
+  const pool = [
+    { isBuzzer: false, cash: 50, multiplier: 0, extraPicks: 0 },
+    { isBuzzer: false, cash: 100, multiplier: 0, extraPicks: 0 },
+    { isBuzzer: false, cash: 200, multiplier: 0, extraPicks: 0 },
+    { isBuzzer: false, cash: 300, multiplier: 0, extraPicks: 0 },
+    { isBuzzer: false, cash: 500, multiplier: 0, extraPicks: 0 },
+    { isBuzzer: false, cash: 0, multiplier: 2, extraPicks: 0 },
+    { isBuzzer: false, cash: 0, multiplier: 3, extraPicks: 0 },
+    { isBuzzer: false, cash: 0, multiplier: 5, extraPicks: 0 },
+    { isBuzzer: false, cash: 0, multiplier: 0, extraPicks: 2 },
+    { isBuzzer: false, cash: 0, multiplier: 0, extraPicks: 2 },
+  ] as VBox[];
+  for (const p of pool) boxes.push({ ...p });
+  for (let i = boxes.length - 1; i > 0; i--) {
     const j = Math.floor(random() * (i + 1));
-    [boxValues[i], boxValues[j]] = [boxValues[j], boxValues[i]];
-    [isBuzzer[i], isBuzzer[j]] = [isBuzzer[j], isBuzzer[i]];
+    [boxes[i], boxes[j]] = [boxes[j], boxes[i]];
   }
 
   let picked = 0;
   let vaultTotal = 0;
   let alive = true;
+  const MAX_VAULT_WIN = 5000; // hard cap to prevent runaway multipliers
+
+  function refreshTotal() {
+    const el = ui.els['vault-total'] as HTMLElement | null;
+    if (el) el.textContent = `Total loot: $${vaultTotal}`;
+  }
 
   for (let i = 0; i < totalBoxes; i++) {
     const box = document.createElement('div');
@@ -334,7 +350,8 @@ function triggerVaultBreak(dialCount: number) {
     box.innerHTML = `<div class="valk">🚪</div><div class="valm">🔒</div>`;
     box.addEventListener('click', () => {
       if (!alive || box.classList.contains('opened') || box.classList.contains('buzzer')) return;
-      if (isBuzzer[Number(box.dataset.index)]) {
+      const prize = boxes[Number(box.dataset.index)];
+      if (prize.isBuzzer) {
         sound.vaultBuzzer();
         box.classList.add('buzzer');
         box.innerHTML = `<div class="valk">🚪</div><div class="valm">⚡</div>`;
@@ -345,18 +362,19 @@ function triggerVaultBreak(dialCount: number) {
       }
       sound.vaultUnlock();
       box.classList.add('opened');
-      const val = boxValues[Number(box.dataset.index)];
       let face = '';
-      if (val <= 5 && val > 0) {
-        face = `$${val}`;
-        vaultTotal += val;
-      } else if (val > 5) {
-        face = `×${val}`;
-        vaultTotal = (vaultTotal || 1) * val;
-      } else {
-        face = '+2 picks';
-        picks += 2;
+      if (prize.cash > 0) {
+        face = `$${prize.cash}`;
+        vaultTotal += prize.cash;
+      } else if (prize.multiplier > 0) {
+        face = `×${prize.multiplier}`;
+        vaultTotal = (vaultTotal || 1) * prize.multiplier;
+      } else if (prize.extraPicks > 0) {
+        face = `+${prize.extraPicks} picks`;
+        picks += prize.extraPicks;
       }
+      vaultTotal = Math.min(vaultTotal, MAX_VAULT_WIN);
+      refreshTotal();
       box.innerHTML = `<div class="valk gold">💎</div><div class="valm">${face}</div>`;
       picked++;
       if (picked >= picks) {
@@ -367,8 +385,7 @@ function triggerVaultBreak(dialCount: number) {
     gridEl.appendChild(box);
   }
 
-  const totalEl = ui.els['vault-total'] as HTMLElement | null;
-  if (totalEl) totalEl.textContent = `Total loot: $${vaultTotal}`;
+  refreshTotal();
 
   function finishVault() {
     const doneBtn = ui.els['vault-done'] as HTMLElement;
