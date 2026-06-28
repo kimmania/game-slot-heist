@@ -23,6 +23,7 @@
         <span class="label">FREE SPINS</span><span id="free-spins">—</span>
       </div>
       <button id="mute-btn" class="toggle" title="Toggle Sound" aria-label="Toggle sound">🔊</button>
+      <button id="reset-btn" class="toggle" title="Reset Game" aria-label="Reset game">🗑️</button>
       <div id="level-wrap"><span class="label">LVL <span id="level">1</span></span><div id="xp-bar"><div id="xp-fill"></div></div></div>
     </header>
 
@@ -134,6 +135,15 @@
       </div>
       <button id="wheel-spin" class="primary">Spin</button>
       <div id="wheel-result"></div>
+    </div>
+  </div>
+
+  <div id="reset-modal" class="modal hidden" role="dialog" aria-modal="true">
+    <div class="modal-content">
+      <h2>🗑️ Reset Game</h2>
+      <p>This will erase your bankroll, level, and all progress. Are you sure?</p>
+      <button id="reset-confirm" class="primary" style="background:linear-gradient(180deg,#ff4444,#cc0000);color:#fff">Yes, Reset Everything</button>
+      <button id="reset-cancel" class="primary">Cancel</button>
     </div>
   </div>
 

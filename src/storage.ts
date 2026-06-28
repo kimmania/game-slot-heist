@@ -18,3 +18,7 @@ export function saveGame(state: SavedGame) {
     // ignore
   }
 }
+
+export function clearGame() {
+  try { localStorage.removeItem(STORAGE_KEY); } catch {}
+}

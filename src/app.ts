@@ -1,4 +1,4 @@
-import { loadGame, saveGame } from './storage';
+import { loadGame, saveGame, clearGame } from './storage';
 import { spinReels, random } from './rng';
 import { evaluateWin, countScatters, countBonus } from './reels';
 import { UI } from './ui';
@@ -68,6 +68,9 @@ function bindEvents() {
   ui.els['paytable-close']?.addEventListener('click', () => ui.hidePaytable());
   ui.els['vault-done']?.addEventListener('click', () => ui.hideVault());
   ui.els['wheel-spin']?.addEventListener('click', () => spinWheel());
+  ui.els['reset-btn']?.addEventListener('click', () => ui.showReset());
+  ui.els['reset-confirm']?.addEventListener('click', () => resetGame());
+  ui.els['reset-cancel']?.addEventListener('click', () => ui.hideReset());
 
   const chips = ui.els['bet-chips'] as HTMLElement | null;
   if (chips) {
@@ -483,6 +486,25 @@ function weightedPick(weights: number[]): number {
     if (r <= 0) return i;
   }
   return weights.length - 1;
+}
+
+function resetGame() {
+  ui.hideReset();
+  clearGame();
+  state = loadGame();
+  grid = [];
+  spinning = false;
+  turbo = false;
+  freeSpins = 0;
+  freeSpinMultiplier = 1;
+  wheelLock = false;
+  spinningWheel = false;
+  syncUI();
+  ui.setFreeSpins(0);
+  ui.setMuteIcon(!state.sound);
+  sound.setMuted(!state.sound);
+  ui.renderGrid(spinReels());
+  ui.toast("Game reset. Good luck!");
 }
 
 function getEmoji(sym: SymbolType): string {

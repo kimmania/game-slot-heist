@@ -6,11 +6,12 @@ export class UI {
   constructor() {
     const ids = [
       'balance','level','xp-fill','reels','bet-amount','bet-minus','bet-plus','spin','turbo','info-btn',
-      'mute-btn','free-spins','bet-chips','recent-wins','win-toast',
+      'mute-btn','free-spins','bet-chips','recent-wins','win-toast','reset-btn',
       'help-modal','help-dismiss','help-paytable-btn','help-paylines',
       'paytable-modal','paytable-close','paytable',
       'vault-break','vault-status','vault-grid','vault-total','vault-done',
       'wheel-modal','wheel','wheel-spin','wheel-result','message-toast',
+      'reset-modal','reset-confirm','reset-cancel',
     ];
     for (const id of ids) {
       this.els[id] = document.getElementById(id);
@@ -148,6 +149,15 @@ export class UI {
   }
   hideWheel() {
     const m = this.els['wheel-modal'];
+    if (m) { m.classList.add('hidden'); document.body.style.overflow = ''; }
+  }
+
+  showReset() {
+    const m = this.els['reset-modal'];
+    if (m) { m.classList.remove('hidden'); document.body.style.overflow = 'hidden'; }
+  }
+  hideReset() {
+    const m = this.els['reset-modal'];
     if (m) { m.classList.add('hidden'); document.body.style.overflow = ''; }
   }
 
