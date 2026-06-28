@@ -122,7 +122,19 @@
   <div id="wheel-modal" class="modal hidden" role="dialog" aria-modal="true">
     <div class="modal-content wheel-content">
       <h2>🎡 Mystery Wheel</h2>
-      <div id="wheel"></div>
+      <div class="wheel-wrap">
+        <div id="wheel">
+          <span class="wheel-label" style="--i:0">×10</span>
+          <span class="wheel-label" style="--i:1">×25</span>
+          <span class="wheel-label" style="--i:2">×50</span>
+          <span class="wheel-label" style="--i:3">×100</span>
+          <span class="wheel-label" style="--i:4">×250</span>
+          <span class="wheel-label" style="--i:5">+5FS</span>
+          <span class="wheel-label" style="--i:6">Vault</span>
+          <span class="wheel-label" style="--i:7">×2K</span>
+        </div>
+        <div class="wheel-pointer"></div>
+      </div>
       <button id="wheel-spin" class="primary">Spin</button>
       <div id="wheel-result"></div>
     </div>

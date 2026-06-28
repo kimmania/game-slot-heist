@@ -398,7 +398,9 @@ function spinWheel() {
   const pickIndex = weightedPick(weights);
   const seg = segments[Math.min(pickIndex, segments.length - 1)];
   const rotations = 4 + Math.floor(random() * 3);
-  const targetDeg = 360 * rotations + (pickIndex * 30) + 15;
+  // 8 segments × 45°. Pointer at top (0°). Bring segment center to top.
+  const targetDeg = 360 * rotations + (337.5 - pickIndex * 45);
+
   wheel.style.transition = 'transform 3s cubic-bezier(0.25, 0.1, 0.25, 1)';
   wheel.style.transform = `rotate(${targetDeg}deg)`;
   spinningWheel = true;
