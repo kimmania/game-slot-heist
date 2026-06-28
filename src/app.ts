@@ -150,13 +150,14 @@ async function onSpin() {
   let totalWin = 0;
   for (const w of wins) totalWin += w.payout;
 
-  if (freeSpins >= 0 && totalWin > 0) {
+  if (totalWin > 0) {
+    sound.winChime();
+  }
+  if (freeSpins > 0 && totalWin > 0) {
     totalWin *= freeSpinMultiplier;
     freeSpinMultiplier++;
   }
-
   if (totalWin > 0) {
-    sound.winChime();
     state.bank += totalWin;
     ui.updateBalance(state.bank, true);
     ui.toast(`Win $${totalWin}!`);

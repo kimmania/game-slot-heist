@@ -6,7 +6,8 @@ export class UI {
   constructor() {
     const ids = [
       'balance','level','xp-fill','reels','bet-amount','bet-minus','bet-plus','spin','turbo','info-btn',
-      'mute-btn','bet-chips','recent-wins','help-modal','help-dismiss','help-paylines','paytable-modal','paytable-close','paytable',
+      'mute-btn','bet-chips','recent-wins','help-modal','help-dismiss','help-paytable-btn','help-paylines',
+      'paytable-modal','paytable-close','paytable',
       'vault-break','vault-status','vault-grid','vault-total','vault-done',
       'wheel-modal','wheel','wheel-spin','wheel-result','message-toast',
     ];
