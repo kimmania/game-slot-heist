@@ -1,6 +1,6 @@
 # 🎰 Slot Heist
 
-A heist-themed slot machine PWA built with Vite + TypeScript. Crack the vault, dodge the alarms, and escape with the loot!
+A heist-themed slot machine PWA built with Vite + TypeScript. Crack the vault, dodge the alarms, spin the mystery wheel, and escape with the loot!
 
 **Live Demo:** [https://kimmania.github.io/game-slot-heist/](https://kimmania.github.io/game-slot-heist/)
 
@@ -8,18 +8,38 @@ A heist-themed slot machine PWA built with Vite + TypeScript. Crack the vault, d
 
 ## Features
 
+### Core Gameplay
 - **5×3 Reel Slot Machine** with 20 paylines and weighted symbol distribution
 - **Heist Theme** — diamond 💎, gold bars 🥇, vault doors 🚪, cash 💵, coins 🪙, cop badges 🛡️, drills 🔩, alarm bells 🔔, and safe dials 🎛️
-- **Progressive Economy** — $500 starting bankroll, bet from $1 to $100
-- **Level Up System** — earn XP on every spin, level up for $200 bank bonuses
+- **Progressive Economy** — $100 starting bankroll, bet from $1 to $25
+- **Level Up System** — earn XP on every spin, level up for $50 bank bonuses
 - **Wild Symbols** — vault doors substitute any pay symbol
-- **Free Spins** — 3+ scatter bells award 10–25 free spins with rising multipliers
-- **Vault Break Bonus** — pick boxes for instant loot, but beware the buzzers!
-- **Mystery Wheel** — random chance to spin for instant prizes up to ×2000
+- **Win Line Overlay** — animated payline highlights on wins
+- **Multiplier Badge** — shows rising free-spin multiplier during bonus rounds
+
+### Bonus Rounds
+- **Free Spins** — 3+ scatter bells award 10–25 free spins with a rising win multiplier (×1 → ×2 → ×3…)
+- **Vault Break** — pick boxes for instant loot (+$50–$500, ×2–×5 multipliers, extra picks). Beware the 2 buzzers that end the round! Max win capped at $5,000 with live remaining-picks counter.
+- **Mystery Wheel** — random chance (~1/75) per spin to spin for prizes up to ×2,000 or +5 free spins. 8 labeled segments with a fixed top pointer.
+
+### UI & Polish
+- **Win Toast** — win amount displayed in gold text directly above the spin button
+- **Animated Balance** — bankroll counts up on wins with coin-blip sounds
+- **Free Spins Counter** — live counter in the top bar (green when active)
 - **Daily Login Bonus** — $100 every 24 hours
 - **Top Wins Leaderboard** — local top 10 wins tracked
 - **Turbo Mode** — skip animations for rapid-fire spins
-- **Save State** — persistent via `localStorage`
+- **Detailed Help Screen** — inline payline mini-grids, symbol info, and full paytable modal
+- **Reset Game** — 🗑️ button with confirmation dialog to wipe all progress and start fresh
+
+### Audio (Muteable)
+- Synthesized effects via the Web Audio API (zero external assets):
+  - Reel ticking during spins
+  - Win chime on payouts
+  - Vault unlock / buzzer SFX
+  - Coin blips during animated count-ups
+  - Button click feedback
+- **Toggle** 🔊/🔇 in the top bar — persists with save state
 
 ---
 
@@ -31,6 +51,7 @@ A heist-themed slot machine PWA built with Vite + TypeScript. Crack the vault, d
 | Language | TypeScript (ES modules, `noEmit`) |
 | PWA | [vite-plugin-pwa](https://vite-pwa-org.netlify.app/) (Workbox `generateSW`) |
 | Styling | Vanilla CSS with CSS custom properties |
+| Audio | Web Audio API (oscillators + gain nodes) |
 | Hosting | [GitHub Pages](https://pages.github.com/) |
 | CI/CD | GitHub Actions |
 
@@ -49,11 +70,12 @@ game-slot-heist/
 │   ├── ui.ts                      # DOM helpers, render, modals
 │   ├── reels.ts                   # Win evaluation, scatter/bonus counting
 │   ├── rng.ts                     # Weighted random symbol generation
-│   ├── storage.ts                 # localStorage read/write
+│   ├── storage.ts                 # localStorage read/write/clear
+│   ├── sound.ts                   # Web Audio API synthesizer (muteable)
 │   ├── types.ts                   # Symbols, paylines, constants, save schema
-│   ├── style.css                  # Global layout, modals, controls
+│   ├── style.css                  # Global layout, modals, controls, wheel
 │   └── reels.css                  # Reel window + spin strip styles
-├── index.html                     # App shell (mobile-optimized viewport)
+├── index.html                     # App shell (mobile-optimized viewport + safe-area)
 ├── package.json
 ├── tsconfig.json
 ├── vite.config.ts                 # Vite + PWA config
@@ -152,11 +174,22 @@ See `.github/workflows/deploy.yml`.
 
 ### Betting Levels
 
-$1, $5, $10, $25, $50, $100
+$1, $2, $5, $10, $25
 
 ### Free Spin Multipliers
 
-Each consecutive free-spin win increases the multiplier by 1 (×1 → ×2 → ×3…).
+Each consecutive free-spin win increases the multiplier by 1 (×1 → ×2 → ×3…). Only applies **during** actual free spins, not normal play.
+
+### Vault Break Prizes (12 boxes)
+- 2 buzzers — end the round immediately
+- Cash: $50, $100, $200, $300, $500
+- Multipliers: ×2, ×3, ×5
+- Extra picks: +2, +2
+- Hard win cap: **$5,000**
+- Live remaining-picks counter shown in the status text
+
+### Mystery Wheel Segments (8)
+1. ×10  2. ×25  3. ×50  4. ×100  5. ×250  6. +5FS  7. Vault Break  8. ×2,000
 
 ---
 
@@ -169,16 +202,23 @@ Game state is persisted to `localStorage` under key `slot-heist-save`:
 - `level` / `xp` — progression
 - `dailyLogin` — last daily bonus timestamp
 - `recentWins` / `topWins` — leaderboard data
-- `turbo` / `sound` — user preferences
+- `turbo` — user preference
+- `sound` — audio enabled (default `true`)
 - `hasSeenHelp` — first-time help flag
+
+**Reset** wipes all of the above and restores defaults.
 
 ---
 
 ## Browser Support
 
 - Chrome / Edge (recommended)
-- Safari (iOS 15+, iPadOS)
+- Safari (iOS 15+, iPadOS) — safe-area insets supported
 - Firefox
+
+### Android Notes
+- `user-scalable=no` viewport + `touch-action: manipulation` prevent zoom/selection issues
+- `-webkit-user-select: none; user-select: none` on `html, body` prevent accidental text-selection / Google Search pop-ups on long-presses
 
 **Add to Home Screen** on iOS/Android for the full standalone PWA experience.
 
