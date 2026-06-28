@@ -95,3 +95,7 @@ export function wheelWin() {
 export function buttonClick() {
   play(600, 0.06, 'square', 0.06, 400);
 }
+
+export function coinBlip() {
+  play(880, 0.04, 'sine', 0.05);
+}

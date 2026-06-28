@@ -6,7 +6,8 @@ export class UI {
   constructor() {
     const ids = [
       'balance','level','xp-fill','reels','bet-amount','bet-minus','bet-plus','spin','turbo','info-btn',
-      'mute-btn','bet-chips','recent-wins','help-modal','help-dismiss','help-paytable-btn','help-paylines',
+      'mute-btn','free-spins','bet-chips','recent-wins','win-toast',
+      'help-modal','help-dismiss','help-paytable-btn','help-paylines',
       'paytable-modal','paytable-close','paytable',
       'vault-break','vault-status','vault-grid','vault-total','vault-done',
       'wheel-modal','wheel','wheel-spin','wheel-result','message-toast',
@@ -16,7 +17,7 @@ export class UI {
     }
   }
 
-  updateBalance(val: number, animate = false) {
+  updateBalance(val: number, animate = false, onTick?: (val: number) => void) {
     const el = this.els['balance'] as HTMLElement;
     if (!el) return;
     const target = el.textContent || '';
@@ -24,15 +25,23 @@ export class UI {
       el.textContent = `$${Math.floor(val).toLocaleString()}`;
       return;
     }
-    // simple count-up
+    // simple count-up with blips
     const start = parseInt(target.replace(/[^0-9-]/g, ''), 10) || 0;
     const end = Math.floor(val);
     const dur = 600;
     const t0 = performance.now();
+    let lastBlip = start;
     const step = (t: number) => {
       const p = Math.min(1, (t - t0) / dur);
       const cur = Math.floor(start + (end - start) * p);
       el.textContent = `$${cur.toLocaleString()}`;
+      if (onTick && cur > lastBlip) {
+        const diff = cur - lastBlip;
+        if (diff >= Math.max(1, Math.floor((end - start) / 12))) {
+          lastBlip = cur;
+          onTick(cur);
+        }
+      }
       if (p < 1) requestAnimationFrame(step);
     };
     requestAnimationFrame(step);
@@ -167,6 +176,23 @@ export class UI {
   setMuteIcon(muted: boolean) {
     const el = this.els['mute-btn'] as HTMLElement | null;
     if (el) el.textContent = muted ? '🔇' : '🔊';
+  }
+
+  setFreeSpins(count: number) {
+    const el = this.els['free-spins'] as HTMLElement | null;
+    if (el) {
+      if (count <= 0) { el.textContent = '—'; el.style.color = 'var(--muted)'; }
+      else { el.textContent = String(count); el.style.color = 'var(--success)'; }
+    }
+  }
+
+  showWinToast(msg: string) {
+    const el = this.els['win-toast'] as HTMLElement | null;
+    if (el) { el.textContent = msg; el.classList.add('visible'); }
+  }
+  hideWinToast() {
+    const el = this.els['win-toast'] as HTMLElement | null;
+    if (el) { el.classList.remove('visible'); }
   }
 
   renderHelpPaylines(paylines: number[][]) {

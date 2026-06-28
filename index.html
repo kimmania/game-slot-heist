@@ -19,6 +19,9 @@
   <div id="app">
     <header id="top-bar">
       <div id="balance-wrap"><span class="label">BANK</span><span id="balance">$100</span></div>
+      <div id="status-wrap">
+        <span class="label">FREE SPINS</span><span id="free-spins">—</span>
+      </div>
       <button id="mute-btn" class="toggle" title="Toggle Sound" aria-label="Toggle sound">🔊</button>
       <div id="level-wrap"><span class="label">LVL <span id="level">1</span></span><div id="xp-bar"><div id="xp-fill"></div></div></div>
     </header>
@@ -52,9 +55,8 @@
         <button class="chip-btn" data-val="5">$5</button>
         <button class="chip-btn" data-val="10">$10</button>
         <button class="chip-btn" data-val="25">$25</button>
-        <button class="chip-btn" data-val="50">$50</button>
-        <button class="chip-btn" data-val="100">$100</button>
       </div>
+      <div id="win-toast"></div>
       <div id="spin-row">
         <button id="turbo" class="toggle" title="Turbo">⚡</button>
         <button id="spin" class="primary">SPIN</button>

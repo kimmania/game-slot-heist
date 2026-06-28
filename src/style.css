@@ -29,6 +29,8 @@ html, body {
   overflow: hidden;
   touch-action: manipulation;
   -webkit-tap-highlight-color: transparent;
+  -webkit-user-select: none;
+  user-select: none;
 }
 
 #app {
@@ -51,11 +53,14 @@ html, body {
   flex-shrink: 0;
 }
 
-#balance-wrap, #level-wrap {
+#balance-wrap, #level-wrap, #status-wrap {
   display: flex;
   flex-direction: column;
   gap: 0.15rem;
 }
+
+#status-wrap { align-items: center; }
+#free-spins { font-weight: 700; font-size: 1.2rem; color: var(--success); }
 
 #mute-btn {
   width: 2.4rem;
@@ -67,6 +72,7 @@ html, body {
 
 #balance-wrap { align-items: flex-start; }
 #level-wrap { align-items: flex-end; }
+#status-wrap { align-items: center; }
 
 .label {
   font-size: 0.65rem;
@@ -181,6 +187,18 @@ html, body {
   z-index: 3;
   transition: top 0.3s ease;
 }
+
+#win-toast {
+  min-height: 1.6rem;
+  text-align: center;
+  font-weight: 700;
+  font-size: 1.1rem;
+  color: var(--accent);
+  text-shadow: 0 0 8px rgba(255,215,0,0.4);
+  opacity: 0;
+  transition: opacity 0.3s ease;
+}
+#win-toast.visible { opacity: 1; }
 
 #multiplier-badge {
   position: absolute;

@@ -61,7 +61,7 @@ export const PAYLINES: number[][] = [
   [0,1,2,2,2], // long diagonal down
 ];
 
-export const BET_AMOUNTS = [1, 2, 5, 10, 25, 50, 100];
+export const BET_AMOUNTS = [1, 2, 5, 10, 25];
 
 export interface SavedGame {
   bank: number;

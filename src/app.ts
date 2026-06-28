@@ -29,6 +29,7 @@ export function init() {
   }
 
   syncUI();
+  ui.setFreeSpins(freeSpins);
   ui.renderHelpPaylines(PAYLINES);
   ui.setMuteIcon(!state.sound);
 
@@ -127,6 +128,7 @@ async function onSpin() {
 
   if (freeSpins > 0) {
     freeSpins--;
+    ui.setFreeSpins(freeSpins);
   } else {
     state.bank -= bet;
     ui.updateBalance(state.bank, false);
@@ -159,16 +161,18 @@ async function onSpin() {
   }
   if (totalWin > 0) {
     state.bank += totalWin;
-    ui.updateBalance(state.bank, true);
-    ui.toast(`Win $${totalWin}!`);
+    ui.showWinToast(`Win $${totalWin}!`);
+    ui.updateBalance(state.bank, true, () => sound.coinBlip());
     addTopWin(totalWin);
     for (const w of wins) ui.highlightCells(w.positions, 'win');
+    setTimeout(() => ui.hideWinToast(), 1400);
   }
 
   const scatters = countScatters(grid);
   if (scatters >= 3) {
     const award = scatters === 5 ? 25 : scatters === 4 ? 15 : 10;
     freeSpins += award;
+    ui.setFreeSpins(freeSpins);
     freeSpinMultiplier = 1;
     ui.toast(`${award} Free Spins!`);
   }
@@ -427,7 +431,7 @@ function spinWheel() {
     { label: '×50', value: () => BET_AMOUNTS[state.betIdx] * 50 },
     { label: '×100', value: () => BET_AMOUNTS[state.betIdx] * 100 },
     { label: '×250', value: () => BET_AMOUNTS[state.betIdx] * 250 },
-    { label: '+5 Free Spins', value: () => { freeSpins += 5; ui.toast("+5 Free Spins!"); return 0; } },
+    { label: '+5 Free Spins', value: () => { freeSpins += 5; ui.setFreeSpins(freeSpins); ui.toast("+5 Free Spins!"); return 0; } },
     { label: 'Vault Break now!', value: () => { setTimeout(() => triggerVaultBreak(3), 400); return 0; } },
     { label: 'JACKPOT ×2000', value: () => BET_AMOUNTS[state.betIdx] * 2000 },
   ];
