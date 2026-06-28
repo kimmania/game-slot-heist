@@ -4,6 +4,7 @@ import { evaluateWin, countScatters, countBonus } from './reels';
 import { UI } from './ui';
 import { BET_AMOUNTS, xpForLevel, SYMBOLS, PAYLINES } from './types';
 import type { SavedGame, SymbolType } from './types';
+import * as sound from './sound';
 
 let state: SavedGame;
 let grid: SymbolType[][] = [];
@@ -18,6 +19,7 @@ const ui = new UI();
 
 export function init() {
   state = loadGame();
+  sound.setMuted(!state.sound);
 
   const now = Date.now();
   if (now - state.dailyLogin > 24 * 60 * 60 * 1000) {
@@ -28,6 +30,7 @@ export function init() {
 
   syncUI();
   ui.renderHelpPaylines(PAYLINES);
+  ui.setMuteIcon(!state.sound);
 
   if (!state.hasSeenHelp) {
     ui.showHelp();
@@ -46,6 +49,12 @@ function bindEvents() {
     turbo = !turbo;
     state.turbo = turbo;
     ui.setTurboActive(turbo);
+    saveGame(state);
+  });
+  ui.els['mute-btn']?.addEventListener('click', () => {
+    state.sound = !state.sound;
+    sound.setMuted(!state.sound);
+    ui.setMuteIcon(!state.sound);
     saveGame(state);
   });
   ui.els['info-btn']?.addEventListener('click', () => { ui.showHelp(); });
@@ -147,6 +156,7 @@ async function onSpin() {
   }
 
   if (totalWin > 0) {
+    sound.winChime();
     state.bank += totalWin;
     ui.updateBalance(state.bank, true);
     ui.toast(`Win $${totalWin}!`);
@@ -263,10 +273,16 @@ function animateOneReel(
         return;
       }
       const p = Math.min(1, elapsed / (duration - delay * 0.6));
+      const lastP = (strip as any).__lastP ?? -1;
+      (strip as any).__lastP = p;
+      // tick every ~8% of progress passing a multiple
+      if (Math.floor(p * 12) > Math.floor(lastP * 12)) {
+        sound.spinTick();
+      }
       const ease = 1 - Math.pow(1 - p, 3);
       strip.style.transform = `translateY(-${ease * endY}px)`;
       if (p < 1) requestAnimationFrame(frame);
-      else resolve();
+      else { sound.reelStop(); resolve(); }
     }
     requestAnimationFrame(frame);
   });
@@ -314,29 +330,33 @@ function triggerVaultBreak(dialCount: number) {
     const box = document.createElement('div');
     box.className = 'vault-box';
     box.dataset.index = String(i);
-    box.textContent = `${i + 1}`;
+    box.innerHTML = `<div class="valk">🚪</div><div class="valm">🔒</div>`;
     box.addEventListener('click', () => {
-      if (!alive || box.classList.contains('opened')) return;
+      if (!alive || box.classList.contains('opened') || box.classList.contains('buzzer')) return;
       if (isBuzzer[Number(box.dataset.index)]) {
+        sound.vaultBuzzer();
         box.classList.add('buzzer');
-        box.textContent = '❌';
+        box.innerHTML = `<div class="valk">🚪</div><div class="valm">⚡</div>`;
         alive = false;
-        ui.toast("Buzzer! Vault Break ends.");
+        ui.toast("Alarm triggered! Vault sealed.");
         finishVault();
         return;
       }
+      sound.vaultUnlock();
       box.classList.add('opened');
       const val = boxValues[Number(box.dataset.index)];
+      let face = '';
       if (val <= 5 && val > 0) {
-        box.textContent = `$${val}`;
+        face = `$${val}`;
         vaultTotal += val;
       } else if (val > 5) {
-        box.textContent = `×${val}`;
+        face = `×${val}`;
         vaultTotal = (vaultTotal || 1) * val;
       } else {
-        box.textContent = '+2';
+        face = '+2 picks';
         picks += 2;
       }
+      box.innerHTML = `<div class="valk gold">💎</div><div class="valm">${face}</div>`;
       picked++;
       if (picked >= picks) {
         alive = false;
@@ -400,13 +420,20 @@ function spinWheel() {
   const rotations = 4 + Math.floor(random() * 3);
   // 8 segments × 45°. Pointer at top (0°). Bring segment center to top.
   const targetDeg = 360 * rotations + (337.5 - pickIndex * 45);
-
   wheel.style.transition = 'transform 3s cubic-bezier(0.25, 0.1, 0.25, 1)';
   wheel.style.transform = `rotate(${targetDeg}deg)`;
   spinningWheel = true;
   btn.disabled = true;
   resultEl.textContent = '';
+
+  let ticks = 0;
+  const tickInt = setInterval(() => {
+    ticks++;
+    if (ticks < 24) sound.wheelTick();
+  }, 120);
+
   setTimeout(() => {
+    clearInterval(tickInt);
     const val = seg.value();
     resultEl.textContent = seg.label;
     if (val > 0) {
@@ -414,6 +441,9 @@ function spinWheel() {
       ui.updateBalance(state.bank, true);
       ui.toast(`Wheel win: $${val}!`);
       addTopWin(val);
+      sound.wheelWin();
+    } else {
+      sound.reelStop(); // small chime for non-cash prizes
     }
     saveGame(state);
     spinningWheel = false;

@@ -6,7 +6,7 @@ export class UI {
   constructor() {
     const ids = [
       'balance','level','xp-fill','reels','bet-amount','bet-minus','bet-plus','spin','turbo','info-btn',
-      'bet-chips','recent-wins','help-modal','help-dismiss','help-paylines','paytable-modal','paytable-close','paytable',
+      'mute-btn','bet-chips','recent-wins','help-modal','help-dismiss','help-paylines','paytable-modal','paytable-close','paytable',
       'vault-break','vault-status','vault-grid','vault-total','vault-done',
       'wheel-modal','wheel','wheel-spin','wheel-result','message-toast',
     ];
@@ -161,6 +161,11 @@ export class UI {
   setTurboActive(v: boolean) {
     const btn = this.els['turbo'] as HTMLElement;
     if (btn) btn.classList.toggle('active', v);
+  }
+
+  setMuteIcon(muted: boolean) {
+    const el = this.els['mute-btn'] as HTMLElement | null;
+    if (el) el.textContent = muted ? '🔇' : '🔊';
   }
 
   renderHelpPaylines(paylines: number[][]) {

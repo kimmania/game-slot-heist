@@ -57,6 +57,14 @@ html, body {
   gap: 0.15rem;
 }
 
+#mute-btn {
+  width: 2.4rem;
+  height: 2.4rem;
+  font-size: 1rem;
+  padding: 0;
+  margin: 0 0.5rem;
+}
+
 #balance-wrap { align-items: flex-start; }
 #level-wrap { align-items: flex-end; }
 
@@ -379,6 +387,25 @@ button.toggle.active {
   font-size: 1.4rem;
   cursor: pointer;
   transition: transform 0.15s ease;
+  position: relative;
+  overflow: hidden;
+}
+
+.vault-box .valk {
+  position: absolute;
+  inset: 0;
+  display: flex; align-items: center; justify-content: center;
+  font-size: 1.2rem;
+  opacity: 0.25;
+  pointer-events: none;
+}
+
+.vault-box .valm {
+  position: relative;
+  z-index: 1;
+  font-size: 1rem;
+  font-weight: 700;
+  text-shadow: 0 1px 3px rgba(0,0,0,0.7);
 }
 
 .vault-box:active { transform: scale(0.95); }
@@ -386,11 +413,35 @@ button.toggle.active {
 .vault-box.opened {
   border-color: var(--accent);
   background: #2a2210;
+  animation: vaultPop 0.3s ease;
+}
+
+.vault-box.opened .valk.gold { opacity: 1; animation: vaultShine 0.8s ease forwards; }
+
+@keyframes vaultPop {
+  0% { transform: scale(1); }
+  40% { transform: scale(1.15); }
+  100% { transform: scale(1); }
+}
+
+@keyframes vaultShine {
+  0% { filter: brightness(1); }
+  50% { filter: brightness(2); }
+  100% { filter: brightness(1.2); }
 }
 
 .vault-box.buzzer {
   border-color: var(--danger);
   background: #2a1010;
+  animation: vaultShake 0.4s ease;
+}
+
+@keyframes vaultShake {
+  0%, 100% { transform: translateX(0); }
+  20% { transform: translateX(-5px); }
+  40% { transform: translateX(5px); }
+  60% { transform: translateX(-3px); }
+  80% { transform: translateX(3px); }
 }
 
 /* Wheel */

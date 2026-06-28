@@ -18,14 +18,9 @@
 <body>
   <div id="app">
     <header id="top-bar">
-      <div id="balance-wrap">
-        <span class="label">BANK</span>
-        <span id="balance">$100</span>
-      </div>
-      <div id="level-wrap">
-        <span class="label">LVL <span id="level">1</span></span>
-        <div id="xp-bar"><div id="xp-fill"></div></div>
-      </div>
+      <div id="balance-wrap"><span class="label">BANK</span><span id="balance">$100</span></div>
+      <button id="mute-btn" class="toggle" title="Toggle Sound" aria-label="Toggle sound">🔊</button>
+      <div id="level-wrap"><span class="label">LVL <span id="level">1</span></span><div id="xp-bar"><div id="xp-fill"></div></div></div>
     </header>
 
     <div id="game-area">
@@ -112,7 +107,7 @@
   <div id="vault-break" class="modal hidden" role="dialog" aria-modal="true">
     <div class="modal-content vault-content">
       <h2>🔐 Vault Break</h2>
-      <p id="vault-status">Pick boxes to reveal loot. Watch out for buzzers!</p>
+      <p id="vault-status">Crack the vault doors before the alarm trips!</p>
       <div id="vault-grid"></div>
       <div id="vault-total"></div>
       <button id="vault-done" class="primary hidden">Collect Loot</button>
