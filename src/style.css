@@ -402,11 +402,30 @@ button.toggle.active {
   display: flex;
   align-items: center;
   justify-content: center;
-  font-size: 1.4rem;
   cursor: pointer;
   transition: transform 0.15s ease;
   position: relative;
   overflow: hidden;
+}
+
+/* Laser-scan line sweeps across the grid every few seconds */
+#vault-grid::before {
+  content: '';
+  position: absolute;
+  left: 0; right: 0;
+  top: 0; height: 2px;
+  background: rgba(255, 60, 60, 0.7);
+  box-shadow: 0 0 8px rgba(255, 60, 60, 0.9);
+  z-index: 2;
+  pointer-events: none;
+  animation: laserScan 2.4s ease-in-out infinite;
+}
+
+@keyframes laserScan {
+  0%   { top: 0; opacity: 0; }
+  15%  { opacity: 1; }
+  85%  { opacity: 1; }
+  100% { top: 100%; opacity: 0; }
 }
 
 .vault-box .valk {
@@ -418,12 +437,23 @@ button.toggle.active {
   pointer-events: none;
 }
 
+/* Red laser-guard corners alert indicator */
 .vault-box .valm {
   position: relative;
   z-index: 1;
   font-size: 1rem;
   font-weight: 700;
   text-shadow: 0 1px 3px rgba(0,0,0,0.7);
+  background: #ff3333;
+  color: #fff;
+  border-radius: 50%;
+  width: 1.3rem; height: 1.3rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 0.6rem;
+  line-height: 1;
+  box-shadow: 0 0 6px rgba(255, 51, 51, 0.7);
 }
 
 .vault-box:active { transform: scale(0.95); }
@@ -451,7 +481,12 @@ button.toggle.active {
 .vault-box.buzzer {
   border-color: var(--danger);
   background: #2a1010;
-  animation: vaultShake 0.4s ease;
+  animation: vaultShake 0.4s ease, vaultAlertPulse 0.6s ease infinite;
+}
+
+@keyframes vaultAlertPulse {
+  0%, 100% { box-shadow: 0 0 0 rgba(255,60,60,0); }
+  50% { box-shadow: 0 0 14px rgba(255,60,60,0.5); }
 }
 
 @keyframes vaultShake {
@@ -583,4 +618,79 @@ button.toggle.active {
 .payline-dot.active {
   background: var(--accent);
   box-shadow: 0 0 4px rgba(255,215,0,0.5);
+}
+
+/* Keypad mini-game (Loot Chest) */
+.keypad-content { align-items: center; position: relative; }
+#keypad-display {
+  font-family: "SF Mono", "SFMono-Regular", Consolas, monospace;
+  font-size: 1.3rem;
+  letter-spacing: 0.5rem;
+  padding: 0.4rem 1rem;
+  border-radius: 0.4rem;
+  border: 1px solid #3a3f4a;
+  background: #0c0e12;
+  color: #ffe166;
+  margin: 0.5rem 0 0.8rem;
+  min-width: 140px;
+  text-align: center;
+}
+
+#keypad-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 56px);
+  gap: 0.5rem;
+  margin-bottom: 0.6rem;
+}
+
+.kpad {
+  width: 56px; height: 48px;
+  border: 1px solid #3a3f4a;
+  border-radius: 0.4rem;
+  background: linear-gradient(180deg,#1e2430,#141820);
+  color: var(--text);
+  font-size: 1.1rem;
+  font-weight: 700;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  user-select: none;
+  -webkit-user-select: none;
+}
+.kpad:active { background: #2a3344; transform: scale(0.96); }
+
+#keypad-timer {
+  font-size: 0.85rem;
+  color: var(--accent);
+  font-weight: 600;
+  margin-bottom: 0.3rem;
+}
+
+#keypad-reward {
+  font-size: 1.1rem;
+  font-weight: 700;
+  color: var(--accent);
+  min-height: 1.4rem;
+  text-align: center;
+  margin: 0.2rem 0 0.4rem;
+}
+
+/* Laser flash on keypad failure */
+#keypad-laser-overlay {
+  position: absolute;
+  inset: 0;
+  border-radius: 0.6rem;
+  pointer-events: none;
+  opacity: 0;
+  z-index: 10;
+  box-shadow: inset 0 0 0 0 rgba(255,60,60,0);
+}
+#keypad-laser-overlay.active {
+  animation: keypadLaserFail 0.25s ease forwards;
+}
+@keyframes keypadLaserFail {
+  0%   { box-shadow: inset 0 0 0 0 rgba(255,60,60,0); opacity: 0; }
+  50%  { box-shadow: inset 0 0 30px 12px rgba(255,60,60,0.55); opacity: 1; }
+  100% { box-shadow: inset 0 0 0 0 rgba(255,60,60,0); opacity: 0; }
 }

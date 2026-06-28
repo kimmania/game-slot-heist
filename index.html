@@ -80,7 +80,7 @@
           <li><strong>💵 Cash Stack</strong> — Mid payout (×75)</li>
           <li><strong>🪙 Gold Coin</strong> — Low payout (×50)</li>
           <li><strong>🛡️ Cop Badge</strong> — Low payout (×30)</li>
-          <li><strong>🔩 Drill Bit</strong> — Low payout (×20)</li>
+          <li><strong>💎 Diamond-Tipped Drill Bit</strong> — Low payout (×20)</li>
           <li><strong>🔔 Alarm Bell</strong> — Scatter (3+ = Free Spins)</li>
           <li><strong>🎛️ Safe Dial</strong> — Bonus (3+ = Vault Break)</li>
         </ul>
@@ -135,6 +135,32 @@
       </div>
       <button id="wheel-spin" class="primary">Spin</button>
       <div id="wheel-result"></div>
+    </div>
+  </div>
+
+  <div id="keypad-modal" class="modal hidden" role="dialog" aria-modal="true">
+    <div class="modal-content keypad-content">
+      <h2>🔐 Loot Chest</h2>
+      <p id="keypad-status">Wire it right to crack the vault!</p>
+      <div id="keypad-display">_ _ _ _</div>
+      <div id="keypad-grid">
+        <button class="kpad" data-k="1">1</button>
+        <button class="kpad" data-k="2">2</button>
+        <button class="kpad" data-k="3">3</button>
+        <button class="kpad" data-k="4">4</button>
+        <button class="kpad" data-k="5">5</button>
+        <button class="kpad" data-k="6">6</button>
+        <button class="kpad" data-k="7">7</button>
+        <button class="kpad" data-k="8">8</button>
+        <button class="kpad" data-k="9">9</button>
+        <button class="kpad" id="keypad-clear">C</button>
+        <button class="kpad" data-k="0">0</button>
+        <button class="kpad" id="keypad-enter">E</button>
+      </div>
+      <div id="keypad-timer">⏱️ 15s</div>
+      <div id="keypad-reward"></div>
+      <button id="keypad-done" class="primary hidden">Collect</button>
+      <div id="keypad-laser-overlay"></div>
     </div>
   </div>
 

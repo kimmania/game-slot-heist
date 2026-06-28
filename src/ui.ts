@@ -12,6 +12,7 @@ export class UI {
       'vault-break','vault-status','vault-grid','vault-total','vault-done',
       'wheel-modal','wheel','wheel-spin','wheel-result','message-toast',
       'reset-modal','reset-confirm','reset-cancel',
+      'keypad-modal','keypad-status','keypad-display','keypad-grid','keypad-timer','keypad-reward','keypad-done','keypad-laser-overlay',
     ];
     for (const id of ids) {
       this.els[id] = document.getElementById(id);
@@ -227,6 +228,39 @@ export class UI {
 
   renderPaytable() {
     // implemented in app.ts
+  }
+
+  showKeypad() {
+    const m = this.els['keypad-modal'];
+    if (m) { m.classList.remove('hidden'); document.body.style.overflow = 'hidden'; }
+  }
+  hideKeypad() {
+    const m = this.els['keypad-modal'];
+    if (m) { m.classList.add('hidden'); document.body.style.overflow = ''; }
+  }
+  setKeypadStatus(msg: string) {
+    const el = this.els['keypad-status'] as HTMLElement | null;
+    if (el) el.textContent = msg;
+  }
+  setKeypadDisplay(code: string) {
+    const el = this.els['keypad-display'] as HTMLElement | null;
+    if (el) el.textContent = code || '_ _ _ _';
+  }
+  setKeypadTimer(count: number) {
+    const el = this.els['keypad-timer'] as HTMLElement | null;
+    if (el) el.textContent = `⏱️ ${count}s`;
+  }
+  setKeypadReward(msg: string) {
+    const el = this.els['keypad-reward'] as HTMLElement | null;
+    if (el) { el.textContent = msg; el.classList.toggle('hidden', !msg); }
+  }
+  laserFlash() {
+    const el = this.els['keypad-laser-overlay'] as HTMLElement | null;
+    if (el) {
+      el.classList.remove('active');
+      void el.offsetWidth; // reflow
+      el.classList.add('active');
+    }
   }
 }
 

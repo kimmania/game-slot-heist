@@ -72,6 +72,19 @@ function bindEvents() {
   ui.els['reset-confirm']?.addEventListener('click', () => resetGame());
   ui.els['reset-cancel']?.addEventListener('click', () => ui.hideReset());
 
+  // Keypad mini-game buttons
+  const kpad = ui.els['keypad-grid'] as HTMLElement | null;
+  if (kpad) {
+    for (const btn of Array.from(kpad.children)) {
+      btn.addEventListener('click', () => {
+        if ((btn as HTMLElement).id === 'keypad-clear') setKeypadInput('', true);
+        else if ((btn as HTMLElement).id === 'keypad-enter') submitKeypadInput();
+        else setKeypadInput(((btn as HTMLElement).dataset.k) || '');
+      });
+    }
+  }
+  ui.els['keypad-done']?.addEventListener('click', () => finishKeypad());
+
   const chips = ui.els['bet-chips'] as HTMLElement | null;
   if (chips) {
     for (const btn of Array.from(chips.children)) {
@@ -141,8 +154,14 @@ async function onSpin() {
 
   grid = spinReels();
 
-  if (!wheelLock && freeSpins <= 0 && random() < 1/75) {
-    setTimeout(() => triggerMysteryWheel(), 600);
+  // Random mini-game trigger (mutually exclusive, ~1/75 wheel, ~1/100 keypad)
+  if (!wheelLock && freeSpins <= 0) {
+    const roll = random();
+    if (roll < 0.01) {
+      setTimeout(() => triggerKeypad(), 600);
+    } else if (roll < 1/70) {
+      setTimeout(() => triggerMysteryWheel(), 600);
+    }
   }
 
   if (!turbo) {
@@ -367,6 +386,7 @@ function triggerVaultBreak(dialCount: number) {
       if (!alive || box.classList.contains('opened') || box.classList.contains('buzzer')) return;
       const prize = boxes[Number(box.dataset.index)];
       if (prize.isBuzzer) {
+        sound.laserZap();
         sound.vaultBuzzer();
         box.classList.add('buzzer');
         box.innerHTML = `<div class="valk">🚪</div><div class="valm">⚡</div>`;
@@ -375,7 +395,9 @@ function triggerVaultBreak(dialCount: number) {
         finishVault();
         return;
       }
+      sound.vaultClick();
       sound.vaultUnlock();
+      sound.metalClank();
       box.classList.add('opened');
       let face = '';
       if (prize.cash > 0) {
@@ -409,7 +431,8 @@ function triggerVaultBreak(dialCount: number) {
     if (doneBtn) doneBtn.classList.remove('hidden');
     if (vaultTotal > 0) {
       state.bank += vaultTotal;
-      ui.updateBalance(state.bank, true);
+      ui.updateBalance(state.bank, true, () => sound.coinBlip());
+      sound.cashRegister();
       ui.toast(`Vault loot: $${vaultTotal}`);
       addTopWin(vaultTotal);
       saveGame(state);
@@ -517,10 +540,96 @@ function resetGame() {
   ui.toast("Game reset. Good luck!");
 }
 
+let keypadTimer: number | undefined;
+let keypadInterval: ReturnType<typeof setInterval> | undefined;
+let keypadCode = '';
+let keypadTarget = '';
+
+/* 4-digit vault code.  Guessed within the time limit = cash prize.
+   Out of attempts or time runs out = laser trap, no payout.              */
+function triggerKeypad(): number {
+  ui.showKeypad();
+  keypadCode = '';
+  // generate a 4-digit numeric code, duplicates allowed for variety
+  let target = '';
+  for (let i = 0; i < 4; i++) target += String(Math.floor(random() * 10));
+  keypadTarget = target;
+  ui.setKeypadDisplay('');
+  ui.setKeypadStatus('Enter the vault code');
+  ui.setKeypadTimer(15);
+  ui.setKeypadReward('');
+  (ui.els['keypad-done'] as HTMLElement)?.classList.add('hidden');
+  const overlay = ui.els['keypad-laser-overlay'] as HTMLElement | null;
+  if (overlay) overlay.classList.remove('active');
+
+  let seconds = 15;
+  if (keypadInterval) clearInterval(keypadInterval);
+  if (keypadTimer) clearTimeout(keypadTimer);
+  keypadInterval = setInterval(() => {
+    seconds--;
+    ui.setKeypadTimer(seconds);
+    if (seconds <= 0) {
+      clearInterval(keypadInterval!);
+      keypadInterval = undefined;
+      failKeypad('Time ran out!');
+    }
+  }, 1000);
+  keypadTimer = window.setTimeout(() => { /* safeguard if interval stalls */ clearInterval(keypadInterval!); keypadInterval = undefined; failKeypad('Time ran out!'); }, 16000);
+  return 0;
+}
+
+function cancelKeypadTimers() {
+  if (keypadInterval) { clearInterval(keypadInterval); keypadInterval = undefined; }
+  if (keypadTimer) { clearTimeout(keypadTimer); keypadTimer = undefined; }
+}
+
+function failKeypad(reason: string) {
+  cancelKeypadTimers();
+  ui.setKeypadStatus(reason);
+  ui.setKeypadReward('No payout — vault sealed!');
+  ui.laserFlash();
+  sound.laserZap();
+  (ui.els['keypad-done'] as HTMLElement)?.classList.remove('hidden');
+}
+
+function setKeypadInput(digit: string, clear = false) {
+  if (clear) { keypadCode = ''; ui.setKeypadDisplay(''); return; }
+  if (keypadCode.length >= 4) return;
+  keypadCode += digit;
+  ui.setKeypadDisplay(keypadCode);
+}
+
+function submitKeypadInput() {
+  if (keypadCode === keypadTarget) {
+    cancelKeypadTimers();
+    // cash reward scales with remaining time: more time left = higher reward
+    const reward = BET_AMOUNTS[state.betIdx] * (20 + Math.floor(Math.random() * 81)); // ×20–×100 of current bet
+    state.bank += reward;
+    ui.updateBalance(state.bank, true, () => sound.coinBlip());
+    sound.cashRegister();
+    ui.setKeypadStatus('Code correct!');
+    ui.setKeypadReward(`Loot: $${reward}`);
+    (ui.els['keypad-done'] as HTMLElement)?.classList.remove('hidden');
+    addTopWin(reward);
+    saveGame(state);
+    return;
+  }
+  sound.laserZap();
+  if (keypadCode !== keypadTarget) {
+    keypadCode = '';
+    ui.setKeypadDisplay('');
+    ui.setKeypadStatus('Incorrect — try again!');
+  }
+}
+
+function finishKeypad() {
+  ui.hideKeypad();
+}
+
 function getEmoji(sym: SymbolType): string {
   const map: Record<SymbolType, string> = {
     diamond: '💎', goldbar: '🥇', vault: '🚪', cash: '💵',
-    coin: '🪙', badge: '🛡️', drill: '🔩', bell: '🔔', dial: '🎛️',
+    coin: '🪙', badge: '🛡️', drill: '💎', bell: '🔔', dial: '🎛️',
   };
   return map[sym] || '❓';
 }

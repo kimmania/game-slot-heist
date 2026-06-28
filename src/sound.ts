@@ -16,12 +16,13 @@ export function isMuted() {
   return _muted;
 }
 
-function play(freq: number, duration: number, type: OscillatorType = 'square', vol = 0.15, slideTo?: number) {
+function play(freq: number, duration: number, type: OscillatorType = 'square', vol = 0.15, slideTo?: number, detune = 0) {
   if (_muted) return;
   const c = getCtx();
   const o = c.createOscillator();
   const g = c.createGain();
   o.type = type;
+  if (detune !== 0) o.detune.value = detune;
   o.frequency.setValueAtTime(freq, c.currentTime);
   if (slideTo !== undefined) {
     o.frequency.exponentialRampToValueAtTime(slideTo, c.currentTime + duration);
@@ -98,4 +99,22 @@ export function buttonClick() {
 
 export function coinBlip() {
   play(880, 0.04, 'sine', 0.05);
+}
+
+export function vaultClick() {
+  play(1500, 0.04, 'square', 0.06, undefined, 0.01);
+}
+
+export function laserZap() {
+  play(200, 0.18, 'sawtooth', 0.1, 600, 0.01);
+}
+
+export function metalClank() {
+  play(120, 0.22, 'square', 0.14, 40, 0.02);
+}
+
+export function cashRegister() {
+  play(1800, 0.05, 'square', 0.07, undefined, 0.0);
+  setTimeout(() => play(1300, 0.08, 'square', 0.09), 60);
+  setTimeout(() => play(2200, 0.04, 'sine', 0.06), 140);
 }
