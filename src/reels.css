@@ -1,0 +1,61 @@
+/*! Slot Heist — Reel / spin-system fix */
+
+/* 1.  Reel strip (spinner container) */
+.reel-strip {
+  display: flex;
+  flex-direction: column;
+  gap: var(--cell-gap);
+  will-change: transform;
+}
+
+/* 2.  Reel is the visual window – shows exactly three cells */
+.reel {
+  position: relative;
+  width: var(--cell-size);
+  height: calc(3 * var(--cell-size) + 2 * var(--cell-gap));
+  overflow: hidden;          /* ← masks the strip */
+  display: flex;
+  flex-direction: column;
+  gap: var(--cell-gap);
+  flex-shrink: 0;
+}
+
+/* 3.  Fade masks on the top / bottom of every reel window */
+.reel::before,
+.reel::after {
+  content: '';
+  position: absolute;
+  left: 0; right: 0;
+  height: 12px;
+  z-index: 1;
+  pointer-events: none;
+}
+.reel::after  { bottom: 0;  background: linear-gradient(to top,    #0f1115, transparent); }
+.reel::before { top:    0;  background: linear-gradient(to bottom, #0f1115, transparent); }
+
+/* 4.  Static grid lives inside same reel windows (renderGrid) */
+#reels {
+  display: flex;
+  gap: var(--cell-gap);
+}
+
+/* 5.  Container keeps the 3-row height locked */
+#reels-container {
+  position: relative;
+  background: linear-gradient(180deg, #1a1e27, #0f1115);
+  border: 2px solid #2a2f3a;
+  border-radius: 0.6rem;
+  padding: var(--cell-gap);
+  box-shadow: 0 0 20px rgba(0,0,0,0.6), inset 0 0 30px rgba(0,0,0,0.4);
+  max-width: 100%;
+}
+
+/* 6.  Dark inner-vignette overlay (no pointer-events, purely cosmetic) */
+#reels-overlay {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  border-radius: 0.6rem;
+  box-shadow: inset 0 0 40px rgba(0,0,0,0.5);
+  z-index: 2;
+}

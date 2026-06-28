@@ -245,8 +245,14 @@ function animateOneReel(
 
     const delay = i * settleDelay;
     const t0 = performance.now() + delay;
-    const cellH = (strip.children[0] as HTMLElement)?.offsetHeight || 60;
-    const endY = (items.length - 3) * cellH;
+
+    // force reflow so strip gets laid out before reading heights
+    void strip.offsetHeight;
+    const cellH = strip.querySelector('.cell')!.getBoundingClientRect().height;
+    const gapH  = parseFloat(getComputedStyle(strip).gap) || parseFloat(getComputedStyle(strip).rowGap) || 0;
+    const stripH = items.length * cellH + (items.length - 1) * gapH;
+    const reelH  = 3 * cellH + 2 * gapH;
+    const endY   = stripH - reelH;
 
     function frame(t: number) {
       const elapsed = t - t0;
@@ -256,8 +262,7 @@ function animateOneReel(
       }
       const p = Math.min(1, elapsed / (duration - delay * 0.6));
       const ease = 1 - Math.pow(1 - p, 3);
-      const y = ease * endY;
-      strip.style.transform = `translateY(-${y}px)`;
+      strip.style.transform = `translateY(-${ease * endY}px)`;
       if (p < 1) requestAnimationFrame(frame);
       else resolve();
     }

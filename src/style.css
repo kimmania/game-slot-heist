@@ -10,6 +10,12 @@
   --wild: #00e5ff;
   --scatter: #ff66aa;
   --bonus: #ffaa00;
+  --cell-size: clamp(48px, 14vw, 78px);
+  --cell-gap: 0.35rem;
+}
+
+@media (orientation: landscape) and (max-height: 500px) {
+  :root { --cell-size: 56px; }
 }
 
 * { box-sizing: border-box; }
@@ -102,25 +108,16 @@ html, body {
   background: linear-gradient(180deg, #1a1e27, #0f1115);
   border: 2px solid #2a2f3a;
   border-radius: 0.6rem;
-  padding: 0.4rem;
+  padding: var(--cell-gap);
   box-shadow: 0 0 20px rgba(0,0,0,0.6), inset 0 0 30px rgba(0,0,0,0.4);
   max-width: 100%;
 }
 
-#reels {
-  display: flex;
-  gap: 0.35rem;
-}
-
-.reel {
-  display: flex;
-  flex-direction: column;
-  gap: 0.35rem;
-}
+/* .reel, .reel-strip, #reels defined in reels.css */
 
 .cell {
-  width: clamp(48px, 14vw, 78px);
-  height: clamp(48px, 14vw, 78px);
+  width: var(--cell-size);
+  height: var(--cell-size);
   background: linear-gradient(145deg, #1e2430, #141820);
   border: 1px solid #2a2f3a;
   border-radius: 0.4rem;
@@ -131,6 +128,7 @@ html, body {
   text-shadow: 0 2px 4px rgba(0,0,0,0.7);
   position: relative;
   overflow: hidden;
+  flex-shrink: 0;
 }
 
 .cell.wild { border-color: var(--wild); box-shadow: 0 0 10px rgba(0,229,255,0.25); }
@@ -456,11 +454,4 @@ button.toggle.active {
 @media (orientation: landscape) and (max-height: 500px) {
   #top-bar { padding: 0.3rem 0.8rem; }
   #controls { padding: 0.4rem 0.8rem 0.6rem; gap: 0.3rem; }
-  .cell { width: 56px; height: 56px; font-size: 1.4rem; }
-}
-
-.reel-strip {
-  display: flex;
-  flex-direction: column;
-  gap: 0.35rem;
 }
