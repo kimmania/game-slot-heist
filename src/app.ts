@@ -666,13 +666,20 @@ function spinWheel() {
     { label: '×100', value: () => BET_AMOUNTS[state.betIdx] * 100 },
     { label: '×250', value: () => BET_AMOUNTS[state.betIdx] * 250 },
     { label: '+5 Free Spins', value: () => { freeSpins += 5; ui.setFreeSpins(freeSpins); ui.toast("+5 Free Spins!"); return 0; } },
-    { label: 'Vault Break now!', value: () => { setTimeout(() => triggerVaultBreak(3), 400); return 0; } },
+    { label: 'Vault Break now!', value: () => {
+        // Close the wheel first so the vault modal isn't buried beneath it
+        ui.hideWheel();
+        wheelLock = false;
+        setTimeout(() => triggerVaultBreak(3), 400);
+        return 0;
+      } },
     { label: 'JACKPOT ×2000', value: () => BET_AMOUNTS[state.betIdx] * 2000 },
   ];
 
   const weights = [2,2,2,2,1,1,1,1];
   const pickIndex = weightedPick(weights);
   const seg = segments[Math.min(pickIndex, segments.length - 1)];
+  const launchesVault = seg.label === 'Vault Break now!';
   const rotations = 4 + Math.floor(random() * 3);
   // 8 segments × 45°. Pointer at top (0°). Bring segment center to top.
   const targetDeg = 360 * rotations + (337.5 - pickIndex * 45);
@@ -706,7 +713,11 @@ function spinWheel() {
     spinningWheel = false;
     btn.disabled = false;
     state.wheelCooldown = Date.now() + 5 * 60 * 1000;
-    setTimeout(() => { ui.hideWheel(); wheelLock = false; }, 1500);
+    // Vault result already closed the wheel itself — don't double-hide or
+    // stomp the vault modal's scroll lock with a second body.overflow reset
+    if (!launchesVault) {
+      setTimeout(() => { ui.hideWheel(); wheelLock = false; }, 1500);
+    }
   }, 3200);
 }
 
