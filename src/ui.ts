@@ -33,7 +33,8 @@ export class UI {
       return;
     }
     // simple count-up with blips
-    const start = parseInt(target.replace(/[^0-9-]/g, ''), 10) || 0;
+    // parse the current display as a real decimal (strip $, commas — keep the dot!)
+    const start = parseFloat(target.replace(/[^0-9.-]/g, '')) || 0;
     const end = Math.round(val * 100) / 100;
     const dur = 600;
     const t0 = performance.now();
