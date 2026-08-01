@@ -520,7 +520,7 @@ function triggerVaultBreak(dialCount: number) {
     const el = ui.els['vault-status'] as HTMLElement | null;
     const remaining = Math.max(0, picks - picked);
     if (el) {
-      el.textContent = `Crack the vault doors before the alarm trips! You have ${remaining} pick${remaining !== 1 ? 's' : ''} remaining.`;
+      el.textContent = `Crack the vault doors before the alarm trips! You have ${remaining} pick${remaining !== 1 ? 's' : ''} remaining. Multipliers apply to loot collected so far.`;
     }
   }
 
@@ -559,7 +559,7 @@ function triggerVaultBreak(dialCount: number) {
         vaultTotal += prize.cash;
       } else if (prize.multiplier > 0) {
         face = `×${prize.multiplier}`;
-        vaultTotal = (vaultTotal || 1) * prize.multiplier;
+        vaultTotal = vaultTotal * prize.multiplier; // no floor: ×N on $0 stays $0
       } else if (prize.extraPicks > 0) {
         face = `+${prize.extraPicks} picks`;
         picks += prize.extraPicks;
