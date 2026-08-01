@@ -6,6 +6,7 @@ import { BET_AMOUNTS, xpForLevel, SYMBOLS, PAYLINES } from './types';
 import type { SavedGame, SymbolType } from './types';
 import * as sound from './sound';
 import { ACHIEVEMENTS } from './achievements';
+import { CREW } from './crew';
 
 let state: SavedGame;
 let grid: SymbolType[][] = [];
@@ -76,6 +77,11 @@ function bindEvents() {
     ui.showAchievements();
   });
   ui.els['achievements-close']?.addEventListener('click', () => ui.hideAchievements());
+  ui.els['crew-btn']?.addEventListener('click', () => {
+    ui.renderCrew(CREW, state.crew || [], state.bank, hireCrew);
+    ui.showCrew();
+  });
+  ui.els['crew-close']?.addEventListener('click', () => ui.hideCrew());
   ui.els['reset-confirm']?.addEventListener('click', () => resetGame());
   ui.els['reset-cancel']?.addEventListener('click', () => ui.hideReset());
 
@@ -186,6 +192,10 @@ async function onSpin() {
     totalWin *= freeSpinMultiplier;
     freeSpinMultiplier++;
   }
+  // The Driver: +10% on every reel win
+  if (totalWin > 0 && hasCrew('driver')) {
+    totalWin = Math.floor(totalWin * 1.1);
+  }
   if (totalWin > 0) {
     state.bank += totalWin;
     // Win tiers relative to bet: ×25+ = BIG WIN, ×100+ = MEGA WIN
@@ -274,6 +284,23 @@ function unlockAchievement(id: string) {
   const def = ACHIEVEMENTS.find(a => a.id === id);
   if (def) ui.toast(`🏆 Achievement: ${def.name}!`);
   saveGame(state);
+}
+
+function hasCrew(id: string): boolean {
+  return (state.crew || []).includes(id);
+}
+
+function hireCrew(id: string) {
+  const member = CREW.find(c => c.id === id);
+  if (!member || hasCrew(id) || state.bank < member.cost) return;
+  state.bank -= member.cost;
+  if (!state.crew) state.crew = [];
+  state.crew.push(id);
+  ui.updateBalance(state.bank, false);
+  ui.toast(`👥 ${member.name} joined the crew!`);
+  sound.cashRegister();
+  saveGame(state);
+  ui.renderCrew(CREW, state.crew, state.bank, hireCrew);
 }
 
 async function animateSpin(finalGrid: SymbolType[][]) {
@@ -405,6 +432,7 @@ function triggerVaultBreak(dialCount: number) {
   let vaultTotal = 0;
   let alive = true;
   let ended = false;
+  let muscleUsed = false;
   const MAX_VAULT_WIN = 5000; // hard cap to prevent runaway multipliers
 
   const cashoutBtn = ui.els['vault-cashout'] as HTMLElement | null;
@@ -449,6 +477,12 @@ function triggerVaultBreak(dialCount: number) {
         sound.vaultBuzzer();
         box.classList.add('buzzer');
         box.innerHTML = `<div class="valk">🚪</div><div class="valm">⚡</div>`;
+        // The Muscle absorbs one buzzer per Vault Break
+        if (hasCrew('muscle') && !muscleUsed) {
+          muscleUsed = true;
+          ui.toast("💪 The Muscle smashed the alarm — keep picking!");
+          return;
+        }
         alive = false;
         ended = true;
         ui.toast("Alarm triggered! Vault sealed.");
@@ -619,14 +653,14 @@ function triggerKeypad(): void {
   keypadTarget = target;
   ui.setKeypadDisplay('');
   ui.setKeypadStatus('Crack the code — green = right spot, amber = wrong spot');
-  ui.setKeypadTimer(30);
+  ui.setKeypadTimer(30 + (hasCrew('hacker') ? 15 : 0));
   ui.setKeypadReward('');
   ui.clearKeypadHints();
   (ui.els['keypad-done'] as HTMLElement)?.classList.add('hidden');
   const overlay = ui.els['keypad-laser-overlay'] as HTMLElement | null;
   if (overlay) overlay.classList.remove('active');
 
-  let seconds = 30;
+  let seconds = 30 + (hasCrew('hacker') ? 15 : 0);
   if (keypadInterval) clearInterval(keypadInterval);
   keypadInterval = setInterval(() => {
     seconds--;

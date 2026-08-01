@@ -27,6 +27,7 @@
         <div id="heat-bar"><div id="heat-fill"></div></div>
       </div>
       <button id="mute-btn" class="toggle" title="Toggle Sound" aria-label="Toggle sound">🔊</button>
+      <button id="crew-btn" class="toggle" title="Crew" aria-label="Crew">👥</button>
       <button id="achievements-btn" class="toggle" title="Achievements" aria-label="Achievements">🏆</button>
       <button id="reset-btn" class="toggle" title="Reset Game" aria-label="Reset game">🗑️</button>
       <div id="level-wrap"><span class="label">LVL <span id="level">1</span></span><div id="xp-bar"><div id="xp-fill"></div></div></div>
@@ -97,6 +98,7 @@
         <p><strong>Vault Break</strong> — 3+ Safe Dials open the vault. Pick boxes, avoid buzzers.</p>
         <p><strong>Wheel of Fortune</strong> — Mystery chance on any spin. Tap to spin for instant prizes.</p>
         <p><strong>Heat</strong> — The HEAT meter rises as you spin. High heat upgrades symbols on the reels — but it vents whenever a bonus round hits.</p>
+        <p><strong>Crew</strong> — Hire specialists with your bankroll (👥 button). The Hacker buys you time on the loot chest, the Muscle eats one vault buzzer, and the Driver adds +10% to every win.</p>
         <h3>Tips</h3>
         <p>Start with low bets. Build your bankroll before chasing the big vault break!</p>
       </div>
@@ -170,6 +172,15 @@
       <div id="keypad-reward"></div>
       <button id="keypad-done" class="primary hidden">Collect</button>
       <div id="keypad-laser-overlay"></div>
+    </div>
+  </div>
+
+  <div id="crew-modal" class="modal hidden" role="dialog" aria-modal="true">
+    <div class="modal-content">
+      <h2>👥 Your Crew</h2>
+      <p class="crew-sub">Hire specialists with your bankroll. Their perks are permanent.</p>
+      <div id="crew-list"></div>
+      <button id="crew-close" class="primary">Close</button>
     </div>
   </div>
 

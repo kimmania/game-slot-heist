@@ -365,6 +365,16 @@ html, body {
 .ach-text small { color: var(--muted); }
 .ach-state { color: var(--success); font-weight: 700; }
 
+.crew-sub { color: var(--muted); font-size: 0.85rem; margin: 0.2rem 0 0.4rem; }
+#crew-list {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  margin: 0.6rem 0;
+  width: 100%;
+}
+.crew-hire:disabled { opacity: 0.4; cursor: default; }
+
 #spin-row {
   display: flex;
   align-items: center;

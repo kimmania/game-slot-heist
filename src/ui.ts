@@ -15,6 +15,7 @@ export class UI {
       'reset-modal','reset-confirm','reset-cancel',
       'keypad-modal','keypad-status','keypad-display','keypad-grid','keypad-timer','keypad-reward','keypad-done','keypad-laser-overlay','keypad-hints',
       'achievements-modal','achievements-list','achievements-btn','achievements-close',
+      'crew-modal','crew-list','crew-btn','crew-close',
     ];
     for (const id of ids) {
       this.els[id] = document.getElementById(id);
@@ -303,6 +304,35 @@ export class UI {
   clearKeypadHints() {
     const el = this.els['keypad-hints'] as HTMLElement | null;
     if (el) el.innerHTML = '';
+  }
+  showCrew() {
+    const m = this.els['crew-modal'];
+    if (m) { m.classList.remove('hidden'); document.body.style.overflow = 'hidden'; }
+  }
+  hideCrew() {
+    const m = this.els['crew-modal'];
+    if (m) { m.classList.add('hidden'); document.body.style.overflow = ''; }
+  }
+  /* Renders crew rows with a Hire button (or HIRED state). onHire is called with the crew id. */
+  renderCrew(defs: { id: string; icon: string; name: string; role: string; desc: string; cost: number }[],
+            hired: string[], bank: number, onHire: (id: string) => void) {
+    const list = this.els['crew-list'] as HTMLElement | null;
+    if (!list) return;
+    list.innerHTML = '';
+    for (const c of defs) {
+      const has = hired.includes(c.id);
+      const afford = bank >= c.cost;
+      const row = document.createElement('div');
+      row.className = 'achievement-row crew-row' + (has ? ' unlocked' : '');
+      const action = has
+        ? `<span class="ach-state">✓</span>`
+        : `<button class="chip-btn crew-hire" data-id="${c.id}" ${afford ? '' : 'disabled'}>Hire $${c.cost}</button>`;
+      row.innerHTML = `<span class="ach-icon">${c.icon}</span><span class="ach-text"><strong>${c.name}</strong> <small>· ${c.role}</small><br><small>${c.desc}</small></span>${action}`;
+      list.appendChild(row);
+    }
+    for (const btn of Array.from(list.querySelectorAll('.crew-hire'))) {
+      btn.addEventListener('click', () => onHire((btn as HTMLElement).dataset.id || ''));
+    }
   }
   showAchievements() {
     const m = this.els['achievements-modal'];
