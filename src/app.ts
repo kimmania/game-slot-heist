@@ -555,14 +555,15 @@ function triggerKeypad(): void {
   for (let i = 0; i < 4; i++) target += String(Math.floor(random() * 10));
   keypadTarget = target;
   ui.setKeypadDisplay('');
-  ui.setKeypadStatus('Enter the vault code');
-  ui.setKeypadTimer(15);
+  ui.setKeypadStatus('Crack the code — green = right spot, amber = wrong spot');
+  ui.setKeypadTimer(30);
   ui.setKeypadReward('');
+  ui.clearKeypadHints();
   (ui.els['keypad-done'] as HTMLElement)?.classList.add('hidden');
   const overlay = ui.els['keypad-laser-overlay'] as HTMLElement | null;
   if (overlay) overlay.classList.remove('active');
 
-  let seconds = 15;
+  let seconds = 30;
   if (keypadInterval) clearInterval(keypadInterval);
   keypadInterval = setInterval(() => {
     seconds--;
@@ -593,8 +594,30 @@ function setKeypadInput(digit: string, clear = false) {
   ui.setKeypadDisplay(keypadCode);
 }
 
+/* Mastermind-style scoring: exact (right digit, right spot) first,
+   then near (right digit, wrong spot) using remaining unmatched digits. */
+function scoreKeypadGuess(guess: string, target: string): ('exact' | 'near' | 'miss')[] {
+  const kinds: ('exact' | 'near' | 'miss')[] = ['miss', 'miss', 'miss', 'miss'];
+  const unmatchedTarget: string[] = [];
+  for (let i = 0; i < 4; i++) {
+    if (guess[i] === target[i]) kinds[i] = 'exact';
+    else unmatchedTarget.push(target[i]);
+  }
+  for (let i = 0; i < 4; i++) {
+    if (kinds[i] === 'exact') continue;
+    const idx = unmatchedTarget.indexOf(guess[i]);
+    if (idx >= 0) {
+      kinds[i] = 'near';
+      unmatchedTarget.splice(idx, 1);
+    }
+  }
+  return kinds;
+}
+
 function submitKeypadInput() {
-  if (keypadCode === keypadTarget) {
+  if (keypadCode.length < 4) return; // require a full guess
+  const guess = keypadCode;
+  if (guess === keypadTarget) {
     cancelKeypadTimers();
     // cash reward scales with remaining time: more time left = higher reward
     const reward = BET_AMOUNTS[state.betIdx] * (20 + Math.floor(Math.random() * 81)); // ×20–×100 of current bet
@@ -609,11 +632,10 @@ function submitKeypadInput() {
     return;
   }
   sound.laserZap();
-  if (keypadCode !== keypadTarget) {
-    keypadCode = '';
-    ui.setKeypadDisplay('');
-    ui.setKeypadStatus('Incorrect — try again!');
-  }
+  ui.addKeypadHint(guess, scoreKeypadGuess(guess, keypadTarget));
+  keypadCode = '';
+  ui.setKeypadDisplay('');
+  ui.setKeypadStatus('Incorrect — check the hint colors and try again!');
 }
 
 function finishKeypad() {

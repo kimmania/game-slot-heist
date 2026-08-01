@@ -12,7 +12,7 @@ export class UI {
       'vault-break','vault-status','vault-grid','vault-total','vault-done',
       'wheel-modal','wheel','wheel-spin','wheel-result','message-toast',
       'reset-modal','reset-confirm','reset-cancel',
-      'keypad-modal','keypad-status','keypad-display','keypad-grid','keypad-timer','keypad-reward','keypad-done','keypad-laser-overlay',
+      'keypad-modal','keypad-status','keypad-display','keypad-grid','keypad-timer','keypad-reward','keypad-done','keypad-laser-overlay','keypad-hints',
     ];
     for (const id of ids) {
       this.els[id] = document.getElementById(id);
@@ -253,6 +253,26 @@ export class UI {
   setKeypadReward(msg: string) {
     const el = this.els['keypad-reward'] as HTMLElement | null;
     if (el) { el.textContent = msg; el.classList.toggle('hidden', !msg); }
+  }
+  /* Mastermind-style hint log. Each guess: array of {digit, kind} where
+     kind = 'exact' (right digit, right spot) | 'near' (right digit, wrong spot) | 'miss' */
+  addKeypadHint(guess: string, kinds: ('exact' | 'near' | 'miss')[]) {
+    const el = this.els['keypad-hints'] as HTMLElement | null;
+    if (!el) return;
+    const row = document.createElement('div');
+    row.className = 'hint-row';
+    for (let i = 0; i < guess.length; i++) {
+      const d = document.createElement('span');
+      d.className = `hint-digit ${kinds[i]}`;
+      d.textContent = guess[i];
+      row.appendChild(d);
+    }
+    el.appendChild(row);
+    el.scrollTop = el.scrollHeight;
+  }
+  clearKeypadHints() {
+    const el = this.els['keypad-hints'] as HTMLElement | null;
+    if (el) el.innerHTML = '';
   }
   laserFlash() {
     const el = this.els['keypad-laser-overlay'] as HTMLElement | null;

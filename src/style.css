@@ -667,6 +667,35 @@ button.toggle.active {
   margin-bottom: 0.3rem;
 }
 
+#keypad-hints {
+  max-height: 92px;
+  overflow-y: auto;
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  margin-bottom: 0.3rem;
+}
+.hint-row {
+  display: flex;
+  justify-content: center;
+  gap: 6px;
+}
+.hint-digit {
+  width: 26px; height: 26px;
+  display: flex; align-items: center; justify-content: center;
+  border-radius: 4px;
+  font-family: "SF Mono", "SFMono-Regular", Consolas, monospace;
+  font-size: 0.85rem;
+  font-weight: 700;
+  border: 1px solid #3a3f4a;
+  background: #141820;
+  color: var(--text);
+}
+.hint-digit.exact { background: #1d4d2b; border-color: #2f7a45; color: #7dffa8; }
+.hint-digit.near  { background: #4d3a10; border-color: #8a6d1f; color: #ffd666; }
+.hint-digit.miss  { color: #555e6e; }
+
 #keypad-reward {
   font-size: 1.1rem;
   font-weight: 700;
