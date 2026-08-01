@@ -5,6 +5,7 @@ import { UI } from './ui';
 import { BET_AMOUNTS, xpForLevel, SYMBOLS, PAYLINES } from './types';
 import type { SavedGame, SymbolType } from './types';
 import * as sound from './sound';
+import { ACHIEVEMENTS } from './achievements';
 
 let state: SavedGame;
 let grid: SymbolType[][] = [];
@@ -70,6 +71,11 @@ function bindEvents() {
   ui.els['vault-done']?.addEventListener('click', () => ui.hideVault());
   ui.els['wheel-spin']?.addEventListener('click', () => spinWheel());
   ui.els['reset-btn']?.addEventListener('click', () => ui.showReset());
+  ui.els['achievements-btn']?.addEventListener('click', () => {
+    ui.renderAchievements(ACHIEVEMENTS, state.achievements || []);
+    ui.showAchievements();
+  });
+  ui.els['achievements-close']?.addEventListener('click', () => ui.hideAchievements());
   ui.els['reset-confirm']?.addEventListener('click', () => resetGame());
   ui.els['reset-cancel']?.addEventListener('click', () => ui.hideReset());
 
@@ -189,6 +195,9 @@ async function onSpin() {
                 : tier === 'big' ? `🎉 BIG WIN $${totalWin}!`
                 : `Win $${totalWin}!`;
     if (tier === 'normal') sound.winChime(); else sound.bigWinFanfare();
+    unlockAchievement('first-win');
+    if (tier === 'big' || tier === 'mega') unlockAchievement('big-win');
+    if (tier === 'mega') unlockAchievement('mega-win');
     ui.showWinToast(label, tier);
     ui.updateBalance(state.bank, true, () => sound.coinBlip());
     addTopWin(totalWin);
@@ -203,10 +212,12 @@ async function onSpin() {
     ui.setFreeSpins(freeSpins);
     freeSpinMultiplier = 1;
     ui.toast(`${award} Free Spins!`);
+    unlockAchievement('free-spins');
   }
 
   const bonusCount = countBonus(grid);
   if (bonusCount >= 3) {
+    unlockAchievement('vault-break');
     setTimeout(() => triggerVaultBreak(bonusCount), 500);
   }
 
@@ -220,6 +231,7 @@ async function onSpin() {
     state.heat = 0;
   } else {
     state.heat = Math.min(100, (state.heat || 0) + 3);
+    if (state.heat >= 100) unlockAchievement('hot-streak');
   }
   ui.updateHeat(state.heat);
 
@@ -238,6 +250,8 @@ function maybeLevelUp() {
     state.level++;
     state.bank += 200;
     ui.toast(`Level Up! You are now level ${state.level}. +$200 bonus!`);
+    if (state.level >= 5) unlockAchievement('level-5');
+    if (state.level >= 10) unlockAchievement('level-10');
     nextXp = xpForLevel(state.level + 1);
   }
   const newNext = xpForLevel(state.level + 1);
@@ -251,6 +265,15 @@ function addTopWin(amount: number) {
   state.topWins.push(amount);
   state.topWins.sort((a, b) => b - a);
   state.topWins = state.topWins.slice(0, 10);
+}
+
+function unlockAchievement(id: string) {
+  if (!state.achievements) state.achievements = [];
+  if (state.achievements.includes(id)) return;
+  state.achievements.push(id);
+  const def = ACHIEVEMENTS.find(a => a.id === id);
+  if (def) ui.toast(`🏆 Achievement: ${def.name}!`);
+  saveGame(state);
 }
 
 async function animateSpin(finalGrid: SymbolType[][]) {
@@ -393,6 +416,7 @@ function triggerVaultBreak(dialCount: number) {
       alive = false;
       ended = true;
       ui.toast(`Cashed out early: $${vaultTotal}`);
+      unlockAchievement('vault-cashout');
       finishVault();
     };
   }
@@ -471,6 +495,7 @@ function triggerVaultBreak(dialCount: number) {
       ui.updateBalance(state.bank, true, () => sound.coinBlip());
       sound.cashRegister();
       ui.toast(`Vault loot: $${vaultTotal}`);
+      if (vaultTotal >= 1000) unlockAchievement('vault-1000');
       addTopWin(vaultTotal);
       saveGame(state);
     }
@@ -531,6 +556,7 @@ function spinWheel() {
     clearInterval(tickInt);
     const val = seg.value();
     resultEl.textContent = seg.label;
+    unlockAchievement('wheel-spin');
     if (val > 0) {
       state.bank += val;
       ui.updateBalance(state.bank, true);
@@ -664,6 +690,7 @@ function submitKeypadInput() {
     ui.setKeypadStatus('Code correct!');
     ui.setKeypadReward(`Loot: $${reward}`);
     (ui.els['keypad-done'] as HTMLElement)?.classList.remove('hidden');
+    unlockAchievement('keypad-win');
     addTopWin(reward);
     saveGame(state);
     return;

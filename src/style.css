@@ -341,6 +341,30 @@ html, body {
 }
 .more-games-link:hover { text-decoration: underline; }
 
+#achievements-list {
+  max-height: 50vh;
+  overflow-y: auto;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  margin: 0.6rem 0;
+  width: 100%;
+}
+.achievement-row {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 6px 8px;
+  border-radius: 6px;
+  border: 1px solid #3a3f4a;
+  background: #141820;
+}
+.achievement-row.locked { opacity: 0.45; }
+.ach-icon { font-size: 1.3rem; }
+.ach-text { flex: 1; text-align: left; line-height: 1.25; }
+.ach-text small { color: var(--muted); }
+.ach-state { color: var(--success); font-weight: 700; }
+
 #spin-row {
   display: flex;
   align-items: center;

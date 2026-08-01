@@ -14,6 +14,7 @@ export class UI {
       'wheel-modal','wheel','wheel-spin','wheel-result','message-toast',
       'reset-modal','reset-confirm','reset-cancel',
       'keypad-modal','keypad-status','keypad-display','keypad-grid','keypad-timer','keypad-reward','keypad-done','keypad-laser-overlay','keypad-hints',
+      'achievements-modal','achievements-list','achievements-btn','achievements-close',
     ];
     for (const id of ids) {
       this.els[id] = document.getElementById(id);
@@ -302,6 +303,26 @@ export class UI {
   clearKeypadHints() {
     const el = this.els['keypad-hints'] as HTMLElement | null;
     if (el) el.innerHTML = '';
+  }
+  showAchievements() {
+    const m = this.els['achievements-modal'];
+    if (m) { m.classList.remove('hidden'); document.body.style.overflow = 'hidden'; }
+  }
+  hideAchievements() {
+    const m = this.els['achievements-modal'];
+    if (m) { m.classList.add('hidden'); document.body.style.overflow = ''; }
+  }
+  renderAchievements(defs: { id: string; icon: string; name: string; desc: string }[], unlocked: string[]) {
+    const list = this.els['achievements-list'] as HTMLElement | null;
+    if (!list) return;
+    list.innerHTML = '';
+    for (const a of defs) {
+      const has = unlocked.includes(a.id);
+      const row = document.createElement('div');
+      row.className = 'achievement-row' + (has ? ' unlocked' : ' locked');
+      row.innerHTML = `<span class="ach-icon">${a.icon}</span><span class="ach-text"><strong>${a.name}</strong><br><small>${a.desc}</small></span><span class="ach-state">${has ? '✓' : '🔒'}</span>`;
+      list.appendChild(row);
+    }
   }
   laserFlash() {
     const el = this.els['keypad-laser-overlay'] as HTMLElement | null;

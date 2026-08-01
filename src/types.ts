@@ -76,6 +76,7 @@ export interface SavedGame {
   hasSeenHelp: boolean;
   wheelCooldown: number;
   heat: number; // 0–100, rises per spin, resets on bonus triggers
+  achievements: string[]; // unlocked achievement ids
 }
 
 export const STORAGE_KEY = 'slot-heist-save';
@@ -93,6 +94,7 @@ export const DEFAULT_SAVE: SavedGame = {
   hasSeenHelp: false,
   wheelCooldown: 0,
   heat: 0,
+  achievements: [],
 };
 
 export function xpForLevel(lvl: number): number {
