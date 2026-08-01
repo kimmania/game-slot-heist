@@ -10,6 +10,8 @@ export interface WinResult {
 
 export function evaluateWin(grid: SymbolType[][], bet: number): WinResult[] {
   const wins: WinResult[] = [];
+  // The bet is spread across all paylines: each line pays (value × bet / lines).
+  const lineBet = bet / PAYLINES.length;
   for (let pi = 0; pi < PAYLINES.length; pi++) {
     const line = PAYLINES[pi];
     let effectiveSym: SymbolType | null = null;
@@ -39,13 +41,13 @@ export function evaluateWin(grid: SymbolType[][], bet: number): WinResult[] {
       if (contiguous === 5) payout = def.value5;
       else if (contiguous === 4) payout = def.value4;
       else payout = def.value3;
-      wins.push({ paylineIndex: pi, symbol: effectiveSym, count: contiguous, payout: payout * bet, positions: pos });
+      wins.push({ paylineIndex: pi, symbol: effectiveSym, count: contiguous, payout: payout * lineBet, positions: pos });
     }
 
     // Edge case: all 5 wilds — treat as diamond win
     if (contiguous === 5 && effectiveSym === null) {
       const def = SYMBOLS.diamond;
-      wins.push({ paylineIndex: pi, symbol: 'diamond', count: 5, payout: def.value5 * bet, positions: pos });
+      wins.push({ paylineIndex: pi, symbol: 'diamond', count: 5, payout: def.value5 * lineBet, positions: pos });
     }
   }
   return wins;

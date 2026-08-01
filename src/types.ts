@@ -12,20 +12,21 @@ export interface SymbolDef {
 }
 
 export const SYMBOLS: Record<SymbolType, SymbolDef> = {
-  diamond: { type: 'diamond', emoji: '💎', value5: 250, value4: 100, value3: 50, scatter: false, bonus: false, wild: false },
-  goldbar: { type: 'goldbar', emoji: '🥇', value5: 125, value4: 50, value3: 25, scatter: false, bonus: false, wild: false },
+  diamond: { type: 'diamond', emoji: '💎', value5: 200, value4: 80, value3: 40, scatter: false, bonus: false, wild: false },
+  goldbar: { type: 'goldbar', emoji: '🥇', value5: 100, value4: 40, value3: 20, scatter: false, bonus: false, wild: false },
   vault:   { type: 'vault',   emoji: '🚪', value5: 0,   value4: 0,  value3: 0,  scatter: false, bonus: false, wild: true },
-  cash:    { type: 'cash',    emoji: '💵', value5: 75,  value4: 30, value3: 15, scatter: false, bonus: false, wild: false },
-  coin:    { type: 'coin',    emoji: '🪙', value5: 50,  value4: 20, value3: 10, scatter: false, bonus: false, wild: false },
-  badge:   { type: 'badge',   emoji: '🛡️', value5: 30,  value4: 12, value3: 6,  scatter: false, bonus: false, wild: false },
-  drill:   { type: 'drill',   emoji: '🔩', value5: 20,  value4: 8,  value3: 4,  scatter: false, bonus: false, wild: false },
+  cash:    { type: 'cash',    emoji: '💵', value5: 60,  value4: 24, value3: 12, scatter: false, bonus: false, wild: false },
+  coin:    { type: 'coin',    emoji: '🪙', value5: 40,  value4: 16, value3: 8,  scatter: false, bonus: false, wild: false },
+  badge:   { type: 'badge',   emoji: '🛡️', value5: 24,  value4: 10, value3: 5,  scatter: false, bonus: false, wild: false },
+  drill:   { type: 'drill',   emoji: '🔩', value5: 16,  value4: 6,  value3: 3,  scatter: false, bonus: false, wild: false },
   bell:    { type: 'bell',    emoji: '🔔', value5: 0,   value4: 0,  value3: 0,  scatter: true,  bonus: false, wild: false },
   dial:    { type: 'dial',    emoji: '🎛️', value5: 0,   value4: 0,  value3: 0,  scatter: false, bonus: true,  wild: false },
 };
 
 export const SYMBOL_LIST: SymbolType[] = Object.keys(SYMBOLS) as SymbolType[];
 
-// Weighted distribution tuned for ~96% RTP and ~22% hit frequency
+// Weighted distribution. Tuned for ~110% RTP (generous but not infinite),
+// free spins ~1/100 spins, vault ~1/90. Scatters deliberately rare.
 export const SYMBOL_WEIGHTS: Record<SymbolType, number> = {
   diamond: 2,
   goldbar: 4,
@@ -34,8 +35,8 @@ export const SYMBOL_WEIGHTS: Record<SymbolType, number> = {
   coin:    12,
   badge:   14,
   drill:   16,
-  bell:    5,
-  dial:    4,
+  bell:    2,
+  dial:    2,
 };
 
 export const PAYLINES: number[][] = [

@@ -225,10 +225,12 @@ async function onSpin() {
 
   const scatters = countScatters(grid);
   if (scatters >= 3) {
-    const award = scatters === 5 ? 25 : scatters === 4 ? 15 : 10;
+    // Retriggers during free spins award the minimum batch, not a full 10–25 chain
+    const wasFree = freeSpins > 0;
+    const award = wasFree ? 5 : scatters === 5 ? 25 : scatters === 4 ? 15 : 10;
     freeSpins += award;
     ui.setFreeSpins(freeSpins);
-    freeSpinMultiplier = 1;
+    if (!wasFree) freeSpinMultiplier = 1;
     ui.toast(`${award} Free Spins!`);
     unlockAchievement('free-spins');
   }

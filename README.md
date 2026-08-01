@@ -172,19 +172,21 @@ See `.github/workflows/deploy.yml`.
 
 ## Game Data
 
-### Symbol Payouts (× bet)
+### Symbol Payouts (× bet per line; total bet spread across 20 lines)
 
 | Symbol | 3 of a kind | 4 of a kind | 5 of a kind |
 |--------|-------------|-------------|-------------|
-| 💎 Diamond | ×40 | ×100 | ×250 |
-| 🥇 Gold Bar | ×25 | ×60 | ×125 |
-| 💵 Cash | ×15 | ×35 | ×75 |
-| 🪙 Coin | ×10 | ×25 | ×50 |
-| 🛡️ Badge | ×6 | ×15 | ×30 |
-| 🔩 Drill | ×4 | ×10 | ×20 |
+| 💎 Diamond | ×40 | ×80 | ×200 |
+| 🥇 Gold Bar | ×20 | ×40 | ×100 |
+| 💵 Cash | ×12 | ×24 | ×60 |
+| 🪙 Coin | ×8 | ×16 | ×40 |
+| 🛡️ Badge | ×5 | ×10 | ×24 |
+| 🔩 Drill | ×3 | ×6 | ×16 |
 | 🚪 Vault | Wild — substitutes any pay symbol | | |
-| 🔔 Bell | 3+ triggers Free Spins (10–25) | | |
+| 🔔 Bell | 3+ triggers Free Spins (10–25; retriggers during free spins award +5) | | |
 | 🎛️ Dial | 3+ triggers Vault Break | | |
+
+Economy tuned to ~110% RTP: free spins ~1 in 100 spins, Vault Break ~1 in 90.
 
 ### Betting Levels
 
