@@ -337,14 +337,29 @@ export class UI {
       const afford = bank >= c.cost;
       const row = document.createElement('div');
       row.className = 'achievement-row crew-row' + (has ? ' unlocked' : '');
-      const action = has
-        ? `<span class="ach-state">✓</span>`
-        : `<button class="chip-btn crew-hire" data-id="${c.id}" ${afford ? '' : 'disabled'}>Hire $${c.cost}</button>`;
-      row.innerHTML = `<span class="ach-icon">${c.icon}</span><span class="ach-text"><strong>${c.name}</strong> <small>· ${c.role}</small><br><small>${c.desc}</small></span>${action}`;
+      const info = document.createElement('span');
+      info.className = 'ach-text';
+      info.innerHTML = `<strong>${c.name}</strong> <small>· ${c.role}</small><br><small>${c.desc}</small>`;
+      const icon = document.createElement('span');
+      icon.className = 'ach-icon';
+      icon.textContent = c.icon;
+      row.appendChild(icon);
+      row.appendChild(info);
+      if (has) {
+        const st = document.createElement('span');
+        st.className = 'ach-state';
+        st.textContent = '✓';
+        row.appendChild(st);
+      } else {
+        const btn = document.createElement('button');
+        btn.className = 'chip-btn crew-hire';
+        btn.dataset.id = c.id;
+        btn.textContent = `Hire $${c.cost}`;
+        if (!afford) btn.disabled = true;
+        btn.addEventListener('click', () => onHire(c.id));
+        row.appendChild(btn);
+      }
       list.appendChild(row);
-    }
-    for (const btn of Array.from(list.querySelectorAll('.crew-hire'))) {
-      btn.addEventListener('click', () => onHire((btn as HTMLElement).dataset.id || ''));
     }
   }
   showAchievements() {

@@ -19,8 +19,20 @@ A heist-themed slot machine PWA built with Vite + TypeScript. Crack the vault, d
 
 ### Bonus Rounds
 - **Free Spins** — 3+ scatter bells award 10–25 free spins with a rising win multiplier (×1 → ×2 → ×3…)
-- **Vault Break** — pick boxes for instant loot (+$50–$500, ×2–×5 multipliers, extra picks). Beware the 2 buzzers that end the round! Max win capped at $5,000 with live remaining-picks counter.
-- **Mystery Wheel** — random chance (~1/75) per spin to spin for prizes up to ×2,000 or +5 free spins. 8 labeled segments with a fixed top pointer.
+- **Vault Break** — pick boxes for instant loot (+$50–$500, ×2–×5 multipliers, extra picks). Beware the 2 buzzers that end the round! Max win capped at $5,000 with live remaining-picks counter. **Cash out early** once loot is on the table, or push your luck for more.
+- **Mystery Wheel** — random chance (~1/70, 5-min cooldown) per spin to spin for prizes up to ×2,000 or +5 free spins. 8 labeled segments with a fixed top pointer.
+- **Loot Chest Keypad** — random chance (~1/100) per spin. Crack a 4-digit code in 30s using Mastermind-style color hints (green = right spot, amber = right digit/wrong spot). Reward scales with bet.
+
+### Meta Systems
+- **Heat Meter** — rises +3 per spin; at high heat up to 4 reel cells per spin get upgraded toward high-value/bonus symbols. Vents whenever a bonus round triggers.
+- **Crew** — spend bankroll on permanent specialists (👥 button):
+  - 🧑‍💻 **The Hacker** ($500) — +15s on the loot chest code timer
+  - 💪 **The Muscle** ($750) — absorbs one buzzer per Vault Break
+  - 🚗 **The Driver** ($1,000) — +10% on every reel win
+- **Achievements** — 12 unlockable achievements (🏆 button): first win, big/mega wins, bonus triggers, level milestones, hot streak, and more.
+- **Daily Heist** — one fixed date-seeded grid per calendar day (📅 button), same for everyone. Best haul per day is tracked.
+- **Win Tiers** — BIG WIN (×25 bet) and MEGA WIN (×100 bet) toasts with a fanfare.
+- **Near-Miss Pulse** — exactly 2 scatters or 2 bonus symbols glow purple after a spin.
 
 ### UI & Polish
 - **Win Toast** — win amount displayed in gold text directly above the spin button
@@ -69,9 +81,11 @@ game-slot-heist/
 │   ├── app.ts                     # Game engine, spin logic, bonuses
 │   ├── ui.ts                      # DOM helpers, render, modals
 │   ├── reels.ts                   # Win evaluation, scatter/bonus counting
-│   ├── rng.ts                     # Weighted random symbol generation
+│   ├── rng.ts                     # Weighted random + heat boost + daily seeded PRNG
 │   ├── storage.ts                 # localStorage read/write/clear
 │   ├── sound.ts                   # Web Audio API synthesizer (muteable)
+│   ├── achievements.ts            # Achievement definitions
+│   ├── crew.ts                    # Crew member definitions
 │   ├── types.ts                   # Symbols, paylines, constants, save schema
 │   ├── style.css                  # Global layout, modals, controls, wheel
 │   └── reels.css                  # Reel window + spin strip styles
@@ -205,6 +219,10 @@ Game state is persisted to `localStorage` under key `slot-heist-save`:
 - `turbo` — user preference
 - `sound` — audio enabled (default `true`)
 - `hasSeenHelp` — first-time help flag
+- `heat` — current heat meter (0–100)
+- `achievements` — unlocked achievement ids
+- `crew` — hired crew member ids
+- `dailyHeist` — last daily-heist date + best haul
 
 **Reset** wipes all of the above and restores defaults.
 
