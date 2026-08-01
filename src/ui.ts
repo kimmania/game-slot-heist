@@ -16,6 +16,7 @@ export class UI {
       'keypad-modal','keypad-status','keypad-display','keypad-grid','keypad-timer','keypad-reward','keypad-done','keypad-laser-overlay','keypad-hints',
       'achievements-modal','achievements-list','achievements-btn','achievements-close',
       'crew-modal','crew-list','crew-btn','crew-close',
+      'daily-modal','daily-btn','daily-play','daily-close','daily-best','daily-status',
     ];
     for (const id of ids) {
       this.els[id] = document.getElementById(id);
@@ -304,6 +305,18 @@ export class UI {
   clearKeypadHints() {
     const el = this.els['keypad-hints'] as HTMLElement | null;
     if (el) el.innerHTML = '';
+  }
+  showDaily() {
+    const m = this.els['daily-modal'];
+    if (m) { m.classList.remove('hidden'); document.body.style.overflow = 'hidden'; }
+  }
+  hideDaily() {
+    const m = this.els['daily-modal'];
+    if (m) { m.classList.add('hidden'); document.body.style.overflow = ''; }
+  }
+  setDailyBest(best: number, dateStr: string) {
+    const el = this.els['daily-best'] as HTMLElement | null;
+    if (el) el.textContent = best > 0 ? `Today's best haul: $${best.toLocaleString()} (${dateStr})` : 'No haul recorded today yet.';
   }
   showCrew() {
     const m = this.els['crew-modal'];

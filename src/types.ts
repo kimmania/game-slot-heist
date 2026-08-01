@@ -78,6 +78,7 @@ export interface SavedGame {
   heat: number; // 0–100, rises per spin, resets on bonus triggers
   achievements: string[]; // unlocked achievement ids
   crew: string[]; // hired crew member ids
+  dailyHeist: { date: string; bestHaul: number }; // date = YYYY-MM-DD
 }
 
 export const STORAGE_KEY = 'slot-heist-save';
@@ -97,6 +98,7 @@ export const DEFAULT_SAVE: SavedGame = {
   heat: 0,
   achievements: [],
   crew: [],
+  dailyHeist: { date: '', bestHaul: 0 },
 };
 
 export function xpForLevel(lvl: number): number {

@@ -28,6 +28,7 @@
       </div>
       <button id="mute-btn" class="toggle" title="Toggle Sound" aria-label="Toggle sound">🔊</button>
       <button id="crew-btn" class="toggle" title="Crew" aria-label="Crew">👥</button>
+      <button id="daily-btn" class="toggle" title="Daily Heist" aria-label="Daily Heist">📅</button>
       <button id="achievements-btn" class="toggle" title="Achievements" aria-label="Achievements">🏆</button>
       <button id="reset-btn" class="toggle" title="Reset Game" aria-label="Reset game">🗑️</button>
       <div id="level-wrap"><span class="label">LVL <span id="level">1</span></span><div id="xp-bar"><div id="xp-fill"></div></div></div>
@@ -99,6 +100,7 @@
         <p><strong>Wheel of Fortune</strong> — Mystery chance on any spin. Tap to spin for instant prizes.</p>
         <p><strong>Heat</strong> — The HEAT meter rises as you spin. High heat upgrades symbols on the reels — but it vents whenever a bonus round hits.</p>
         <p><strong>Crew</strong> — Hire specialists with your bankroll (👥 button). The Hacker buys you time on the loot chest, the Muscle eats one vault buzzer, and the Driver adds +10% to every win.</p>
+        <p><strong>Daily Heist</strong> — One fixed grid per calendar day (📅 button). The grid is the same for everyone all day — chase your best haul.</p>
         <h3>Tips</h3>
         <p>Start with low bets. Build your bankroll before chasing the big vault break!</p>
       </div>
@@ -172,6 +174,16 @@
       <div id="keypad-reward"></div>
       <button id="keypad-done" class="primary hidden">Collect</button>
       <div id="keypad-laser-overlay"></div>
+    </div>
+  </div>
+
+  <div id="daily-modal" class="modal hidden" role="dialog" aria-modal="true">
+    <div class="modal-content">
+      <h2>📅 Daily Heist</h2>
+      <p id="daily-status">One fixed grid for today. Everyone gets the same reels — how much can you pull from it?</p>
+      <p id="daily-best"></p>
+      <button id="daily-play" class="primary">Play Today's Grid</button>
+      <button id="daily-close" class="chip-btn">Close</button>
     </div>
   </div>
 

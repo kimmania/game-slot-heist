@@ -1,5 +1,5 @@
 import { loadGame, saveGame, clearGame } from './storage';
-import { spinReels, spinReelsWithHeat, random } from './rng';
+import { spinReels, spinReelsWithHeat, dailyGrid, random } from './rng';
 import { evaluateWin, countScatters, countBonus } from './reels';
 import { UI } from './ui';
 import { BET_AMOUNTS, xpForLevel, SYMBOLS, PAYLINES } from './types';
@@ -82,6 +82,14 @@ function bindEvents() {
     ui.showCrew();
   });
   ui.els['crew-close']?.addEventListener('click', () => ui.hideCrew());
+  ui.els['daily-btn']?.addEventListener('click', () => {
+    const dh = state.dailyHeist || { date: '', bestHaul: 0 };
+    const today = todayStr();
+    ui.setDailyBest(dh.date === today ? dh.bestHaul : 0, today);
+    ui.showDaily();
+  });
+  ui.els['daily-close']?.addEventListener('click', () => ui.hideDaily());
+  ui.els['daily-play']?.addEventListener('click', () => { ui.hideDaily(); playDailyHeist(); });
   ui.els['reset-confirm']?.addEventListener('click', () => resetGame());
   ui.els['reset-cancel']?.addEventListener('click', () => ui.hideReset());
 
@@ -301,6 +309,58 @@ function hireCrew(id: string) {
   sound.cashRegister();
   saveGame(state);
   ui.renderCrew(CREW, state.crew, state.bank, hireCrew);
+}
+
+function todayStr(): string {
+  const d = new Date();
+  return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}-${String(d.getDate()).padStart(2, '0')}`;
+}
+
+/* Daily Heist: play today's fixed grid once per current bet. Winnings count as
+   the "haul"; best haul per day is tracked. No bonus rounds trigger — the grid
+   is evaluated flat so it's comparable day to day. */
+async function playDailyHeist() {
+  if (spinning) return;
+  const bet = BET_AMOUNTS[state.betIdx];
+  if (state.bank < bet) {
+    ui.toast("Not enough bankroll for the daily heist!");
+    return;
+  }
+  spinning = true;
+  ui.disableSpin(true);
+  ui.clearHighlights();
+  state.bank -= bet;
+  ui.updateBalance(state.bank, false);
+
+  const grid = dailyGrid(todayStr());
+  if (!turbo) await animateSpin(grid);
+  else ui.renderGrid(grid);
+
+  const wins = evaluateWin(grid, bet);
+  let totalWin = 0;
+  for (const w of wins) totalWin += w.payout;
+  if (totalWin > 0 && hasCrew('driver')) totalWin = Math.floor(totalWin * 1.1);
+
+  if (totalWin > 0) {
+    state.bank += totalWin;
+    sound.winChime();
+    ui.showWinToast(`Daily heist haul: $${totalWin}!`);
+    ui.updateBalance(state.bank, true, () => sound.coinBlip());
+    addTopWin(totalWin);
+    for (const w of wins) ui.highlightCells(w.positions, 'win');
+    setTimeout(() => ui.hideWinToast(), 1800);
+    const dh = state.dailyHeist || { date: '', bestHaul: 0 };
+    const today = todayStr();
+    if (dh.date !== today || totalWin > dh.bestHaul) {
+      state.dailyHeist = { date: today, bestHaul: totalWin };
+      ui.toast(`📅 New daily best: $${totalWin}!`);
+    }
+  } else {
+    ui.toast("Daily heist came up empty — same grid all day, try a different bet.");
+  }
+  saveGame(state);
+  spinning = false;
+  ui.disableSpin(false);
 }
 
 async function animateSpin(finalGrid: SymbolType[][]) {
