@@ -157,9 +157,10 @@ async function onSpin() {
   // Random mini-game trigger (mutually exclusive, ~1/75 wheel, ~1/100 keypad)
   if (!wheelLock && freeSpins <= 0) {
     const roll = random();
+    const wheelReady = Date.now() >= (state.wheelCooldown || 0);
     if (roll < 0.01) {
       setTimeout(() => triggerKeypad(), 600);
-    } else if (roll < 1/70) {
+    } else if (roll < 1/70 && wheelReady) {
       setTimeout(() => triggerMysteryWheel(), 600);
     }
   }
@@ -540,14 +541,13 @@ function resetGame() {
   ui.toast("Game reset. Good luck!");
 }
 
-let keypadTimer: number | undefined;
 let keypadInterval: ReturnType<typeof setInterval> | undefined;
 let keypadCode = '';
 let keypadTarget = '';
 
 /* 4-digit vault code.  Guessed within the time limit = cash prize.
    Out of attempts or time runs out = laser trap, no payout.              */
-function triggerKeypad(): number {
+function triggerKeypad(): void {
   ui.showKeypad();
   keypadCode = '';
   // generate a 4-digit numeric code, duplicates allowed for variety
@@ -564,23 +564,17 @@ function triggerKeypad(): number {
 
   let seconds = 15;
   if (keypadInterval) clearInterval(keypadInterval);
-  if (keypadTimer) clearTimeout(keypadTimer);
   keypadInterval = setInterval(() => {
     seconds--;
     ui.setKeypadTimer(seconds);
     if (seconds <= 0) {
-      clearInterval(keypadInterval!);
-      keypadInterval = undefined;
       failKeypad('Time ran out!');
     }
   }, 1000);
-  keypadTimer = window.setTimeout(() => { /* safeguard if interval stalls */ clearInterval(keypadInterval!); keypadInterval = undefined; failKeypad('Time ran out!'); }, 16000);
-  return 0;
 }
 
 function cancelKeypadTimers() {
   if (keypadInterval) { clearInterval(keypadInterval); keypadInterval = undefined; }
-  if (keypadTimer) { clearTimeout(keypadTimer); keypadTimer = undefined; }
 }
 
 function failKeypad(reason: string) {
@@ -629,7 +623,7 @@ function finishKeypad() {
 function getEmoji(sym: SymbolType): string {
   const map: Record<SymbolType, string> = {
     diamond: '💎', goldbar: '🥇', vault: '🚪', cash: '💵',
-    coin: '🪙', badge: '🛡️', drill: '💎', bell: '🔔', dial: '🎛️',
+    coin: '🪙', badge: '🛡️', drill: '🔩', bell: '🔔', dial: '🎛️',
   };
   return map[sym] || '❓';
 }
