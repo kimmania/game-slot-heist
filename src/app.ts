@@ -289,10 +289,11 @@ function maybeLevelUp() {
 }
 
 function addTopWin(amount: number) {
-  state.recentWins.push(amount);
+  const rounded = Math.round(amount * 100) / 100;
+  state.recentWins.push(rounded);
   if (state.recentWins.length > 5) state.recentWins.shift();
-  for (const a of state.recentWins) ui.addRecentWin(a);
-  state.topWins.push(amount);
+  ui.addRecentWin(rounded); // append just the new badge, not the whole history
+  state.topWins.push(rounded);
   state.topWins.sort((a, b) => b - a);
   state.topWins = state.topWins.slice(0, 10);
 }

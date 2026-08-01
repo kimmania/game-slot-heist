@@ -142,7 +142,8 @@ export class UI {
     const badges = Array.from(el.children);
     if (badges.length >= 5) badges[0].remove();
     const span = document.createElement('span');
-    span.textContent = `$${amount}`;
+    const rounded = Math.round(amount * 100) / 100;
+    span.textContent = `$${rounded.toLocaleString(undefined, { minimumFractionDigits: 0, maximumFractionDigits: 2 })}`;
     el.appendChild(span);
   }
 
