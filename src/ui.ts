@@ -26,21 +26,22 @@ export class UI {
   updateBalance(val: number, animate = false, onTick?: (val: number) => void) {
     const el = this.els['balance'] as HTMLElement;
     if (!el) return;
+    const fmtBal = (n: number) => `$${(Math.round(n * 100) / 100).toLocaleString(undefined, { minimumFractionDigits: 0, maximumFractionDigits: 2 })}`;
     const target = el.textContent || '';
     if (!animate) {
-      el.textContent = `$${Math.floor(val).toLocaleString()}`;
+      el.textContent = fmtBal(val);
       return;
     }
     // simple count-up with blips
     const start = parseInt(target.replace(/[^0-9-]/g, ''), 10) || 0;
-    const end = Math.floor(val);
+    const end = Math.round(val * 100) / 100;
     const dur = 600;
     const t0 = performance.now();
     let lastBlip = start;
     const step = (t: number) => {
       const p = Math.min(1, (t - t0) / dur);
-      const cur = Math.floor(start + (end - start) * p);
-      el.textContent = `$${cur.toLocaleString()}`;
+      const cur = start + (end - start) * p;
+      el.textContent = fmtBal(cur);
       if (onTick && cur > lastBlip) {
         const diff = cur - lastBlip;
         if (diff >= Math.max(1, Math.floor((end - start) / 12))) {

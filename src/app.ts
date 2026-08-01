@@ -206,21 +206,31 @@ async function onSpin() {
   }
   if (totalWin > 0) {
     state.bank += totalWin;
+    state.bank = Math.round(state.bank * 100) / 100;
     // Win tiers relative to bet: ×25+ = BIG WIN, ×100+ = MEGA WIN
     const ratio = totalWin / bet;
     const tier = ratio >= 100 ? 'mega' : ratio >= 25 ? 'big' : 'normal';
-    const label = tier === 'mega' ? `💰 MEGA WIN $${totalWin}!`
-                : tier === 'big' ? `🎉 BIG WIN $${totalWin}!`
-                : `Win $${totalWin}!`;
-    if (tier === 'normal') sound.winChime(); else sound.bigWinFanfare();
-    unlockAchievement('first-win');
-    if (tier === 'big' || tier === 'mega') unlockAchievement('big-win');
-    if (tier === 'mega') unlockAchievement('mega-win');
-    ui.showWinToast(label, tier);
-    ui.updateBalance(state.bank, true, () => sound.coinBlip());
-    addTopWin(totalWin);
-    for (const w of wins) ui.highlightCells(w.positions, 'win');
-    setTimeout(() => ui.hideWinToast(), tier === 'normal' ? 1400 : 2200);
+    const fmt = (n: number) => n.toLocaleString(undefined, { minimumFractionDigits: 0, maximumFractionDigits: 2 });
+    const label = tier === 'mega' ? `💰 MEGA WIN $${fmt(totalWin)}!`
+                : tier === 'big' ? `🎉 BIG WIN $${fmt(totalWin)}!`
+                : `Win $${fmt(totalWin)}!`;
+    const isNetWin = totalWin >= bet;
+    if (isNetWin) {
+      // Real win — full feedback
+      if (tier === 'normal') sound.winChime(); else sound.bigWinFanfare();
+      unlockAchievement('first-win');
+      if (tier === 'big' || tier === 'mega') unlockAchievement('big-win');
+      if (tier === 'mega') unlockAchievement('mega-win');
+      ui.showWinToast(label, tier);
+      addTopWin(totalWin);
+      for (const w of wins) ui.highlightCells(w.positions, 'win');
+      setTimeout(() => ui.hideWinToast(), tier === 'normal' ? 1400 : 2200);
+    } else {
+      // Partial return (less than the bet) — credit quietly, no fanfare
+      ui.showWinToast(`+$${fmt(totalWin)}`, 'normal');
+      setTimeout(() => ui.hideWinToast(), 900);
+    }
+    ui.updateBalance(state.bank, isNetWin, isNetWin ? () => sound.coinBlip() : undefined);
   }
 
   const scatters = countScatters(grid);
