@@ -9,7 +9,7 @@ export class UI {
       'mute-btn','free-spins','bet-chips','recent-wins','win-toast','reset-btn',
       'help-modal','help-dismiss','help-paytable-btn','help-paylines',
       'paytable-modal','paytable-close','paytable',
-      'vault-break','vault-status','vault-grid','vault-total','vault-done',
+      'vault-break','vault-status','vault-grid','vault-total','vault-done','vault-cashout',
       'wheel-modal','wheel','wheel-spin','wheel-result','message-toast',
       'reset-modal','reset-confirm','reset-cancel',
       'keypad-modal','keypad-status','keypad-display','keypad-grid','keypad-timer','keypad-reward','keypad-done','keypad-laser-overlay','keypad-hints',

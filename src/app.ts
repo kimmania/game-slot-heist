@@ -363,11 +363,27 @@ function triggerVaultBreak(dialCount: number) {
   let picked = 0;
   let vaultTotal = 0;
   let alive = true;
+  let ended = false;
   const MAX_VAULT_WIN = 5000; // hard cap to prevent runaway multipliers
+
+  const cashoutBtn = ui.els['vault-cashout'] as HTMLElement | null;
+  const doneBtn = ui.els['vault-done'] as HTMLElement;
+  if (cashoutBtn) {
+    cashoutBtn.classList.add('hidden');
+    cashoutBtn.onclick = () => {
+      if (!alive || ended || vaultTotal <= 0) return;
+      alive = false;
+      ended = true;
+      ui.toast(`Cashed out early: $${vaultTotal}`);
+      finishVault();
+    };
+  }
 
   function refreshTotal() {
     const el = ui.els['vault-total'] as HTMLElement | null;
     if (el) el.textContent = `Total loot: $${vaultTotal}`;
+    // Cash-out only makes sense once there's loot on the table
+    if (cashoutBtn && !ended) cashoutBtn.classList.toggle('hidden', vaultTotal <= 0);
   }
 
   function refreshStatus() {
@@ -392,6 +408,7 @@ function triggerVaultBreak(dialCount: number) {
         box.classList.add('buzzer');
         box.innerHTML = `<div class="valk">🚪</div><div class="valm">⚡</div>`;
         alive = false;
+        ended = true;
         ui.toast("Alarm triggered! Vault sealed.");
         finishVault();
         return;
@@ -418,6 +435,7 @@ function triggerVaultBreak(dialCount: number) {
       picked++;
       if (picked >= picks) {
         alive = false;
+        ended = true;
         finishVault();
       }
     });
@@ -428,7 +446,7 @@ function triggerVaultBreak(dialCount: number) {
   refreshTotal();
 
   function finishVault() {
-    const doneBtn = ui.els['vault-done'] as HTMLElement;
+    if (cashoutBtn) cashoutBtn.classList.add('hidden');
     if (doneBtn) doneBtn.classList.remove('hidden');
     if (vaultTotal > 0) {
       state.bank += vaultTotal;
