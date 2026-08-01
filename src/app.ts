@@ -791,7 +791,8 @@ function cancelKeypadTimers() {
 function failKeypad(reason: string) {
   cancelKeypadTimers();
   ui.setKeypadStatus(reason);
-  ui.setKeypadReward('No payout — vault sealed!');
+  ui.setKeypadDisplay(keypadTarget); // reveal the code in the entry display
+  ui.setKeypadReward(`No payout — vault sealed! The code was ${keypadTarget.split('').join(' ')}`);
   ui.laserFlash();
   sound.laserZap();
   (ui.els['keypad-done'] as HTMLElement)?.classList.remove('hidden');
