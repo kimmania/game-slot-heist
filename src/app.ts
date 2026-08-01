@@ -493,6 +493,7 @@ function triggerVaultBreak(dialCount: number) {
   let alive = true;
   let ended = false;
   let muscleUsed = false;
+  let skipRefresh = false;
   const MAX_VAULT_WIN = 5000; // hard cap to prevent runaway multipliers
 
   const cashoutBtn = ui.els['vault-cashout'] as HTMLElement | null;
@@ -559,13 +560,20 @@ function triggerVaultBreak(dialCount: number) {
         vaultTotal += prize.cash;
       } else if (prize.multiplier > 0) {
         face = `×${prize.multiplier}`;
-        vaultTotal = vaultTotal * prize.multiplier; // no floor: ×N on $0 stays $0
+        const before = vaultTotal;
+        vaultTotal = Math.min(vaultTotal * prize.multiplier, MAX_VAULT_WIN); // no floor: ×N on $0 stays $0
+        if (before > 0) {
+          flashVaultMultiply(before, prize.multiplier, vaultTotal);
+          skipRefresh = true; // don't let the shared refreshTotal() wipe the flash
+        } else {
+          ui.toast(`×${prize.multiplier} multiplier — but no loot yet to multiply!`);
+        }
       } else if (prize.extraPicks > 0) {
         face = `+${prize.extraPicks} picks`;
         picks += prize.extraPicks;
       }
       vaultTotal = Math.min(vaultTotal, MAX_VAULT_WIN);
-      refreshTotal();
+      if (skipRefresh) skipRefresh = false; else refreshTotal();
       refreshStatus();
       box.innerHTML = `<div class="valk gold">💎</div><div class="valm">${face}</div>`;
       picked++;
@@ -580,6 +588,19 @@ function triggerVaultBreak(dialCount: number) {
 
   refreshStatus();
   refreshTotal();
+
+  /* Briefly show the multiplication math in the total line, e.g. "$300 ×5 → $1,500",
+     so the multiplier's effect is visible instead of a silent total change. */
+  function flashVaultMultiply(before: number, mult: number, after: number) {
+    const el = ui.els['vault-total'] as HTMLElement | null;
+    if (!el) return;
+    el.textContent = `$${before} ×${mult} → $${after}`;
+    el.classList.add('mult-flash');
+    setTimeout(() => {
+      el.classList.remove('mult-flash');
+      refreshTotal();
+    }, 1400);
+  }
 
   function finishVault() {
     if (cashoutBtn) cashoutBtn.classList.add('hidden');

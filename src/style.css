@@ -375,6 +375,19 @@ html, body {
 }
 .crew-hire:disabled { opacity: 0.4; cursor: default; }
 
+#vault-total.mult-flash {
+  color: var(--accent);
+  font-weight: 800;
+  font-size: 1.1rem;
+  text-shadow: 0 0 12px rgba(255,215,0,0.7);
+  animation: multPop 0.35s ease;
+}
+@keyframes multPop {
+  0% { transform: scale(1); }
+  40% { transform: scale(1.12); }
+  100% { transform: scale(1); }
+}
+
 #spin-row {
   display: flex;
   align-items: center;
