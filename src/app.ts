@@ -175,20 +175,24 @@ async function onSpin() {
   let totalWin = 0;
   for (const w of wins) totalWin += w.payout;
 
-  if (totalWin > 0) {
-    sound.winChime();
-  }
   if (freeSpins > 0 && totalWin > 0) {
     totalWin *= freeSpinMultiplier;
     freeSpinMultiplier++;
   }
   if (totalWin > 0) {
     state.bank += totalWin;
-    ui.showWinToast(`Win $${totalWin}!`);
+    // Win tiers relative to bet: ×25+ = BIG WIN, ×100+ = MEGA WIN
+    const ratio = totalWin / bet;
+    const tier = ratio >= 100 ? 'mega' : ratio >= 25 ? 'big' : 'normal';
+    const label = tier === 'mega' ? `💰 MEGA WIN $${totalWin}!`
+                : tier === 'big' ? `🎉 BIG WIN $${totalWin}!`
+                : `Win $${totalWin}!`;
+    if (tier === 'normal') sound.winChime(); else sound.bigWinFanfare();
+    ui.showWinToast(label, tier);
     ui.updateBalance(state.bank, true, () => sound.coinBlip());
     addTopWin(totalWin);
     for (const w of wins) ui.highlightCells(w.positions, 'win');
-    setTimeout(() => ui.hideWinToast(), 1400);
+    setTimeout(() => ui.hideWinToast(), tier === 'normal' ? 1400 : 2200);
   }
 
   const scatters = countScatters(grid);

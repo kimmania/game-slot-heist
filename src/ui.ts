@@ -214,9 +214,14 @@ export class UI {
     }
   }
 
-  showWinToast(msg: string) {
+  showWinToast(msg: string, tier: 'normal' | 'big' | 'mega' = 'normal') {
     const el = this.els['win-toast'] as HTMLElement | null;
-    if (el) { el.textContent = msg; el.classList.add('visible'); }
+    if (el) {
+      el.textContent = msg;
+      el.classList.remove('big', 'mega');
+      if (tier !== 'normal') el.classList.add(tier);
+      el.classList.add('visible');
+    }
   }
   hideWinToast() {
     const el = this.els['win-toast'] as HTMLElement | null;

@@ -61,6 +61,25 @@ export function winChime() {
   });
 }
 
+/* Bigger fanfare for BIG / MEGA wins — rising major arpeggio with a top sparkle. */
+export function bigWinFanfare() {
+  if (_muted) return;
+  const c = getCtx();
+  const notes = [392, 523, 659, 784, 1047, 1319, 1568];
+  notes.forEach((f, i) => {
+    const o = c.createOscillator();
+    const g = c.createGain();
+    o.type = 'triangle';
+    o.frequency.value = f;
+    g.gain.setValueAtTime(0.1, c.currentTime + i * 0.07);
+    g.gain.exponentialRampToValueAtTime(0.001, c.currentTime + i * 0.07 + 0.4);
+    o.connect(g);
+    g.connect(c.destination);
+    o.start(c.currentTime + i * 0.07);
+    o.stop(c.currentTime + i * 0.07 + 0.45);
+  });
+}
+
 export function vaultUnlock() {
   play(420, 0.15, 'sawtooth', 0.1, 800);
   setTimeout(() => play(800, 0.2, 'triangle', 0.08), 80);

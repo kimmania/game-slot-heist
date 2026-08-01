@@ -209,6 +209,21 @@ html, body {
   transition: opacity 0.3s ease;
 }
 #win-toast.visible { opacity: 1; }
+#win-toast.big {
+  font-size: 1.5rem;
+  color: #ffe166;
+  text-shadow: 0 0 14px rgba(255,215,0,0.8);
+}
+#win-toast.mega {
+  font-size: 1.9rem;
+  color: #fff3b0;
+  text-shadow: 0 0 20px rgba(255,215,0,1), 0 0 40px rgba(255,140,0,0.7);
+  animation: megaGlow 0.4s ease-in-out 3;
+}
+@keyframes megaGlow {
+  0%, 100% { transform: scale(1); }
+  50% { transform: scale(1.15); }
+}
 
 #multiplier-badge {
   position: absolute;
