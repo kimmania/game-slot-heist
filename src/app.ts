@@ -205,6 +205,11 @@ async function onSpin() {
     setTimeout(() => triggerVaultBreak(bonusCount), 500);
   }
 
+  // Near-miss tension: exactly 2 scatters or 2 bonus symbols pulse
+  if (scatters < 3 && bonusCount < 3) {
+    ui.pulseNearMiss(grid);
+  }
+
   if (!turbo && totalWin <= 0 && scatters < 3 && bonusCount < 3) {
     await new Promise(r => setTimeout(r, 300));
   }

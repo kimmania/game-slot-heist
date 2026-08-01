@@ -1,3 +1,4 @@
+import { SYMBOLS } from './types';
 import type { SymbolType } from './types';
 
 export class UI {
@@ -93,8 +94,24 @@ export class UI {
     for (const reelEl of container.children) {
       for (const cell of reelEl.children) {
         cell.classList.remove('win');
+        cell.classList.remove('near-miss');
       }
     }
+  }
+
+  /* Near-miss: exactly 2 scatters or 2 bonus symbols — pulse those cells. */
+  pulseNearMiss(grid: SymbolType[][]) {
+    const scat: [number, number][] = [];
+    const bon: [number, number][] = [];
+    for (let r = 0; r < 5; r++) {
+      for (let row = 0; row < 3; row++) {
+        const s = SYMBOLS[grid[r][row]];
+        if (s.scatter) scat.push([r, row]);
+        if (s.bonus) bon.push([r, row]);
+      }
+    }
+    const targets = scat.length === 2 ? scat : bon.length === 2 ? bon : [];
+    if (targets.length) this.highlightCells(targets, 'near-miss');
   }
 
   setBetDisplay(amount: number) {

@@ -156,6 +156,16 @@ html, body {
   box-shadow: 0 0 14px rgba(255,215,0,0.35);
 }
 
+.cell.near-miss {
+  animation: nearMissPulse 0.6s ease-in-out 3;
+  border-color: #c95bff;
+  box-shadow: 0 0 12px rgba(201,91,255,0.4);
+}
+@keyframes nearMissPulse {
+  0%, 100% { transform: scale(1); }
+  50% { transform: scale(1.12); box-shadow: 0 0 18px rgba(201,91,255,0.7); }
+}
+
 @keyframes winPulse {
   0%, 100% { transform: scale(1); }
   50% { transform: scale(1.08); }
