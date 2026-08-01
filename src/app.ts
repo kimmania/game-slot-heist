@@ -519,6 +519,8 @@ function triggerVaultBreak(dialCount: number) {
       ended = true;
       ui.toast(`Cashed out early: $${vaultTotal}`);
       unlockAchievement('vault-cashout');
+      const statusEl = ui.els['vault-status'] as HTMLElement | null;
+      if (statusEl) statusEl.textContent = '💰 Clean getaway — collect your loot!';
       finishVault();
     };
   }
@@ -534,7 +536,11 @@ function triggerVaultBreak(dialCount: number) {
     const el = ui.els['vault-status'] as HTMLElement | null;
     const remaining = Math.max(0, picks - picked);
     if (el) {
-      el.textContent = `Crack the vault doors before the alarm trips! You have ${remaining} pick${remaining !== 1 ? 's' : ''} remaining. Multipliers apply to loot collected so far.`;
+      if (remaining === 0) {
+        el.textContent = `No picks left — collect your loot!`;
+      } else {
+        el.textContent = `Crack the vault doors before the alarm trips! You have ${remaining} pick${remaining !== 1 ? 's' : ''} remaining. Multipliers apply to loot collected so far.`;
+      }
     }
   }
 
@@ -560,6 +566,8 @@ function triggerVaultBreak(dialCount: number) {
         alive = false;
         ended = true;
         ui.toast("Alarm triggered! Vault sealed.");
+        const statusEl = ui.els['vault-status'] as HTMLElement | null;
+        if (statusEl) statusEl.textContent = '🚨 Alarm tripped — vault sealed! Collect what you grabbed.';
         finishVault();
         return;
       }
@@ -587,9 +595,9 @@ function triggerVaultBreak(dialCount: number) {
       }
       vaultTotal = Math.min(vaultTotal, MAX_VAULT_WIN);
       if (skipRefresh) skipRefresh = false; else refreshTotal();
+      picked++;
       refreshStatus();
       box.innerHTML = `<div class="valk gold">💎</div><div class="valm">${face}</div>`;
-      picked++;
       if (picked >= picks) {
         alive = false;
         ended = true;
