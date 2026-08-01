@@ -712,7 +712,7 @@ function triggerKeypad(): void {
   for (let i = 0; i < 4; i++) target += String(Math.floor(random() * 10));
   keypadTarget = target;
   ui.setKeypadDisplay('');
-  ui.setKeypadStatus('Crack the code — green = right spot, amber = wrong spot');
+  ui.setKeypadStatus('Type 4 digits, tap ⏎ ENTER to guess — green = right spot, amber = wrong spot');
   ui.setKeypadTimer(30 + (hasCrew('hacker') ? 15 : 0));
   ui.setKeypadReward('');
   ui.clearKeypadHints();

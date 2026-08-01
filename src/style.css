@@ -756,6 +756,23 @@ button.toggle.active {
 }
 .kpad:active { background: #2a3344; transform: scale(0.96); }
 
+.kpad-action {
+  flex-direction: column;
+  font-size: 1.1rem;
+  gap: 1px;
+}
+.kpad-action small {
+  font-size: 0.5rem;
+  font-weight: 700;
+  letter-spacing: 0.06em;
+  color: var(--muted);
+}
+.kpad-enter {
+  border-color: var(--accent);
+  color: var(--accent);
+}
+.kpad-enter small { color: var(--accent-dim); }
+
 #keypad-timer {
   font-size: 0.85rem;
   color: var(--accent);
