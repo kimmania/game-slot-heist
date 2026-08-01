@@ -43,3 +43,28 @@ export function spinReels(): SymbolType[][] {
   }
   return result;
 }
+
+/* Heat-boosted spin: nudge up to `boost` cells toward high-value symbols.
+   Boost 0 = normal spin. This creates the push-your-luck heat mechanic. */
+const HEAT_TARGETS: SymbolType[] = ['diamond', 'goldbar', 'cash', 'bell', 'dial'];
+
+export function spinReelsWithHeat(boost: number): SymbolType[][] {
+  const grid = spinReels();
+  let remaining = Math.min(boost, 15);
+  // walk cells in random order, upgrading low-value symbols
+  const cells: [number, number][] = [];
+  for (let r = 0; r < 5; r++) for (let row = 0; row < 3; row++) cells.push([r, row]);
+  for (let i = cells.length - 1; i > 0; i--) {
+    const j = Math.floor(random() * (i + 1));
+    [cells[i], cells[j]] = [cells[j], cells[i]];
+  }
+  for (const [r, row] of cells) {
+    if (remaining <= 0) break;
+    const cur = grid[r][row];
+    if (cur === 'diamond' || cur === 'vault') continue; // already top tier
+    if (HEAT_TARGETS.includes(cur) && random() < 0.5) continue; // sometimes leave mid-tier alone
+    grid[r][row] = HEAT_TARGETS[Math.floor(random() * HEAT_TARGETS.length)];
+    remaining--;
+  }
+  return grid;
+}

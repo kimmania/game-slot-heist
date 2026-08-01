@@ -101,6 +101,33 @@ html, body {
   margin-top: 0.1rem;
 }
 
+#heat-wrap {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+#heat-bar {
+  width: 4rem;
+  height: 0.35rem;
+  background: #2a2f3a;
+  border-radius: 0.2rem;
+  overflow: hidden;
+  margin-top: 0.1rem;
+}
+#heat-fill {
+  height: 100%;
+  width: 0%;
+  background: linear-gradient(90deg, #e8a33d, #ff4d2e);
+  transition: width 0.4s ease;
+}
+#heat-wrap.hot #heat-fill {
+  animation: heatFlicker 0.5s ease-in-out infinite alternate;
+}
+@keyframes heatFlicker {
+  from { filter: brightness(1); }
+  to { filter: brightness(1.5); }
+}
+
 #xp-fill {
   height: 100%;
   width: 0%;
@@ -303,6 +330,16 @@ html, body {
   color: var(--accent);
   background: #2a2210;
 }
+
+.more-games-link {
+  display: inline-block;
+  margin-top: 0.6rem;
+  color: var(--accent);
+  font-size: 0.9rem;
+  font-weight: 600;
+  text-decoration: none;
+}
+.more-games-link:hover { text-decoration: underline; }
 
 #spin-row {
   display: flex;

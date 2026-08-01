@@ -7,7 +7,7 @@ export class UI {
   constructor() {
     const ids = [
       'balance','level','xp-fill','reels','bet-amount','bet-minus','bet-plus','spin','turbo','info-btn',
-      'mute-btn','free-spins','bet-chips','recent-wins','win-toast','reset-btn',
+      'mute-btn','free-spins','bet-chips','recent-wins','win-toast','reset-btn','heat-wrap','heat-fill',
       'help-modal','help-dismiss','help-paytable-btn','help-paylines',
       'paytable-modal','paytable-close','paytable',
       'vault-break','vault-status','vault-grid','vault-total','vault-done','vault-cashout',
@@ -112,6 +112,13 @@ export class UI {
     }
     const targets = scat.length === 2 ? scat : bon.length === 2 ? bon : [];
     if (targets.length) this.highlightCells(targets, 'near-miss');
+  }
+
+  updateHeat(heat: number) {
+    const fill = this.els['heat-fill'] as HTMLElement | null;
+    if (fill) fill.style.width = `${Math.min(100, heat)}%`;
+    const wrap = this.els['heat-wrap'] as HTMLElement | null;
+    if (wrap) wrap.classList.toggle('hot', heat >= 70);
   }
 
   setBetDisplay(amount: number) {

@@ -75,6 +75,7 @@ export interface SavedGame {
   sound: boolean;
   hasSeenHelp: boolean;
   wheelCooldown: number;
+  heat: number; // 0–100, rises per spin, resets on bonus triggers
 }
 
 export const STORAGE_KEY = 'slot-heist-save';
@@ -91,6 +92,7 @@ export const DEFAULT_SAVE: SavedGame = {
   sound: true,
   hasSeenHelp: false,
   wheelCooldown: 0,
+  heat: 0,
 };
 
 export function xpForLevel(lvl: number): number {

@@ -1,5 +1,5 @@
 import { loadGame, saveGame, clearGame } from './storage';
-import { spinReels, random } from './rng';
+import { spinReels, spinReelsWithHeat, random } from './rng';
 import { evaluateWin, countScatters, countBonus } from './reels';
 import { UI } from './ui';
 import { BET_AMOUNTS, xpForLevel, SYMBOLS, PAYLINES } from './types';
@@ -30,6 +30,7 @@ export function init() {
 
   syncUI();
   ui.setFreeSpins(freeSpins);
+  ui.updateHeat(state.heat || 0);
   ui.renderHelpPaylines(PAYLINES);
   ui.setMuteIcon(!state.sound);
 
@@ -152,7 +153,7 @@ async function onSpin() {
     maybeLevelUp();
   }
 
-  grid = spinReels();
+  grid = spinReelsWithHeat(Math.floor((state.heat || 0) / 25)); // 0–4 boosted cells at high heat
 
   // Random mini-game trigger (mutually exclusive, ~1/75 wheel, ~1/100 keypad)
   if (!wheelLock && freeSpins <= 0) {
@@ -213,6 +214,14 @@ async function onSpin() {
   if (scatters < 3 && bonusCount < 3) {
     ui.pulseNearMiss(grid);
   }
+
+  // Heat: builds on regular spins, vents when a bonus round triggers
+  if (scatters >= 3 || bonusCount >= 3) {
+    state.heat = 0;
+  } else {
+    state.heat = Math.min(100, (state.heat || 0) + 3);
+  }
+  ui.updateHeat(state.heat);
 
   if (!turbo && totalWin <= 0 && scatters < 3 && bonusCount < 3) {
     await new Promise(r => setTimeout(r, 300));
@@ -562,6 +571,7 @@ function resetGame() {
   spinningWheel = false;
   syncUI();
   ui.setFreeSpins(0);
+  ui.updateHeat(0);
   ui.setMuteIcon(!state.sound);
   sound.setMuted(!state.sound);
   ui.renderGrid(spinReels());
